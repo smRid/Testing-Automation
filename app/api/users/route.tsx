@@ -1,4 +1,4 @@
-import { db, users } from "@db";
+import { db, users } from "@/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
