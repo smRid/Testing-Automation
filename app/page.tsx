@@ -1,3 +1,9 @@
+import {
+  Show,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from '@clerk/nextjs';
 import React from 'react';
 
 export default function Home() {
@@ -13,6 +19,27 @@ export default function Home() {
         </p>
         
         <div style={styles.ctaGroup}>
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button type="button" style={{ ...styles.primaryCta, ...styles.buttonCta }}>
+                Sign in
+              </button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <button type="button" style={{ ...styles.secondaryCta, ...styles.buttonCta }}>
+                Create account
+              </button>
+            </SignUpButton>
+          </Show>
+          <Show when="signed-in">
+            <div style={styles.signedInControls}>
+              <span style={styles.signedInText}>Signed in</span>
+              <UserButton />
+            </div>
+          </Show>
+        </div>
+
+        <div style={styles.docsGroup}>
           <a href="https://nextjs.org/docs" target="_blank" rel="noopener noreferrer" style={styles.primaryCta}>
             Read Next.js Docs
           </a>
@@ -111,6 +138,16 @@ const styles: Record<string, React.CSSProperties> = {
   ctaGroup: {
     display: 'flex',
     gap: '1rem',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  docsGroup: {
+    display: 'flex',
+    gap: '1rem',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: '1rem',
   },
   primaryCta: {
     padding: '0.75rem 1.5rem',
@@ -121,6 +158,11 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     transition: 'opacity 0.2s',
   },
+  buttonCta: {
+    border: 0,
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+  },
   secondaryCta: {
     padding: '0.75rem 1.5rem',
     borderRadius: '8px',
@@ -130,6 +172,19 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     border: '1px solid #3f3f46',
     transition: 'background-color 0.2s',
+  },
+  signedInControls: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    padding: '0.5rem 0.75rem',
+    borderRadius: '8px',
+    backgroundColor: '#18181b',
+    border: '1px solid #3f3f46',
+  },
+  signedInText: {
+    fontSize: '0.875rem',
+    color: '#d4d4d8',
   },
   grid: {
     display: 'grid',
