@@ -1,8 +1,9 @@
 'use client';
 
+import { UserDetailContext } from '@/context/UserDetailContext';
 import { useUser } from '@clerk/nextjs';
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function Provider({
   children,
@@ -10,6 +11,7 @@ function Provider({
   children: React.ReactNode;
 }>) {
   const { isLoaded, isSignedIn } = useUser();
+  const [userDetail, setUserDetail] = useState<any>(null);
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) {
@@ -20,6 +22,7 @@ function Provider({
       const result = await axios.post('/api/users', {});
 
       console.log("Result", result);
+      setUserDetail(result.data?.user);
     };
 
     createNewUser().catch((error) => {
@@ -28,7 +31,9 @@ function Provider({
   }, [isLoaded, isSignedIn]);
 
   return (
+    <UserDetailContext.Provider value={{userDetail, setUserDetail}}>
     <div>{children}</div>
+    </UserDetailContext.Provider>
   );
 }
 
