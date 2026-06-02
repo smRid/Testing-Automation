@@ -1,8 +1,11 @@
+import WorkspaceBody from '@/components/custom/WorkspaceBody'
 import React from 'react'
 
 const Workspace = () => {
   return (
-    <div>Workspace</div>
+    <div className='mx-auto max-w-4xl mt-10'>
+      <WorkspaceBody/>
+    </div>
   )
 }
 
