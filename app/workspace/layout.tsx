@@ -1,10 +1,14 @@
-import React from 'react'
+import Workspaceheader from '@/components/custom/WorkspaceHeader';
+
 
 function WorkspaceLayout({ children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div>{children}</div>
+    <div>
+      <Workspaceheader />
+      {children}
+    </div>
   )
 }
 
