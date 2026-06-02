@@ -4,26 +4,32 @@ import React, { useContext } from 'react'
 import { Card } from '../ui/card';
 import Image from 'next/image';
 import { Button } from '../ui/button';
+import EmptyWorkspace from './EmptyWorkspace';
 
 function WorkspaceBody() {
 
   const { userDetail } = useContext(UserDetailContext);
+  const remainingCredits = userDetail?.credits ?? 1000;
 
   return (
-    <div>
-        <div className='flex justify-between items-center'>
-            <h2 className='text-4xl font-medium'>Workspace</h2>
-            <h2 className='bg-purple-100 p-2 rounded-lg font-medium text-purple-700'>{userDetail?.credits } Credits remains:</h2>
+    <div className='w-full'>
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+            <h2 className='text-[44px] font-semibold leading-none tracking-normal text-black'>Workspace</h2>
+            <h2 className='w-fit rounded-[8px] bg-[#dce9ff] px-3 py-1 text-[20px] font-medium leading-tight text-[#1c3f89]'>Remaining Credits: {remainingCredits}</h2>
         </div>
 
-        <Card className={'mt-5 flex justify-between items-center'}>
-            <div className='flex items-center gap-5'>
-                <Image src={'/github.svg'} alt='github' width={50} height={50} />
-                <h2 className='text-lg'>Connect Github & Add Repository</h2>
+        <Card className={'mt-[27px] flex min-h-[98px] items-center justify-between rounded-[10px] border-[#dedede] bg-white px-[21px] py-5 text-black shadow-[0_2px_5px_rgba(0,0,0,0.13)]'}>
+            <div className='flex min-w-0 items-center gap-[28px]'>
+                <Image src={'/github.svg'} alt='github' width={54} height={54} className='h-[54px] w-[54px] shrink-0' />
+                <h2 className='text-[25px] font-medium leading-tight tracking-normal'>Connect Github & Add Repository</h2>
             </div>
             <div>
-                <Button className='cursor-pointer'>Install</Button>
+                <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer'>Install</Button>
             </div>
+        </Card>
+
+        <Card className='mt-[51px] min-h-[370px] rounded-[12px] border-[#dedede] bg-white text-black shadow-[0_2px_5px_rgba(0,0,0,0.13)]'>
+            <EmptyWorkspace/>
         </Card>
     </div>
   )

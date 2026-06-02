@@ -4,20 +4,21 @@ import React from 'react'
 
 function WorkspaceHeader() {
   return (
-    <div className='flex w-full justify-between p-4'>
-      {/* Logo */}
-      <Image src={'/logo.svg'} alt='logo' width={200} height={200} />
+    <header className='flex h-[124px] w-full items-start border-t-[2px] border-[#8ecbd1] bg-white px-5 pt-[22px] text-black'>
+      <div className='grid w-full grid-cols-[1fr_auto_1fr] items-start'>
+        <Image src={'/logo.svg'} alt='logo' width={214} height={40} className='h-[40px] w-[214px]' />
 
-      {/* menu Options */}
-      <ul className='flex gap-5 text-xl'>
-        <li className='hover:text-blue-600 p-2 cursor-pointer rounded-lg'>Workspace</li>
-        <li className='hover:text-blue-600 p-2 cursor-pointer rounded-lg'>Pricing</li>
-        <li className='hover:text-blue-600 p-2 cursor-pointer rounded-lg'>Support</li>
-      </ul>
-      {/* User Button */}
+        <ul className='flex items-center gap-[42px] text-[26px] font-medium leading-none'>
+          <li className='cursor-pointer rounded-lg p-2 hover:text-blue-600'>Workspace</li>
+          <li className='cursor-pointer rounded-lg p-2 hover:text-blue-600'>Pricing</li>
+          <li className='cursor-pointer rounded-lg p-2 hover:text-blue-600'>Support</li>
+        </ul>
 
-      <UserButton />
-    </div>
+        <div className='flex justify-end pt-1'>
+          <UserButton />
+        </div>
+      </div>
+    </header>
   )
 }
 

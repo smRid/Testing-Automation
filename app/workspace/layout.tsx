@@ -1,11 +1,10 @@
-import WorkspaceHeader from '@/components/custom/WorkspaceHeader';   
-
+import WorkspaceHeader from '@/components/custom/WorkspaceHeader'
 
 function WorkspaceLayout({ children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="min-h-screen bg-white">
       <WorkspaceHeader />
       {children}
     </div>
