@@ -1,4 +1,4 @@
-import Workspaceheader from '@/components/custom/WorkspaceHeader';
+import WorkspaceHeader from '@/components/custom/WorkspaceHeader';   
 
 
 function WorkspaceLayout({ children }: {
@@ -6,7 +6,7 @@ function WorkspaceLayout({ children }: {
 }) {
   return (
     <div>
-      <Workspaceheader />
+      <WorkspaceHeader />
       {children}
     </div>
   )
