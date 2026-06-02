@@ -5,11 +5,18 @@ import { Card } from '../ui/card';
 import Image from 'next/image';
 import { Button } from '../ui/button';
 import EmptyWorkspace from './EmptyWorkspace';
+import { useRouter } from 'next/navigation';
 
 function WorkspaceBody() {
 
+
   const { userDetail } = useContext(UserDetailContext);
   const remainingCredits = userDetail?.credits ?? 1000;
+    const router=useRouter()
+
+const OnAddRepo = async () => {
+    router.push('/api/github');
+}
 
   return (
     <div className='w-full'>
@@ -24,7 +31,7 @@ function WorkspaceBody() {
                 <h2 className='text-[25px] font-medium leading-tight tracking-normal'>Connect Github & Add Repository</h2>
             </div>
             <div>
-                <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer'>Install</Button>
+                <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer' onClick={OnAddRepo}>Connect</Button>
             </div>
         </Card>
 
