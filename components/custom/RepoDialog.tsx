@@ -9,11 +9,23 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "../ui/button"
 import { DialogClose } from "@radix-ui/react-dialog"
+import { useEffect } from "react";
+import axios from "axios";
 
 function RepoDialog() {
+
+    useEffect(()=>{
+    GetRepoList();
+    },[])
+
+    const GetRepoList = async () => {
+        const result = await axios.get('/api/github/repos');
+        console.log(result.data);
+    }
+    
     return (
     <Dialog>
-        <DialogTrigger>
+        <DialogTrigger asChild>
         <Button>+Add Repo</Button>
         </DialogTrigger>
         <DialogContent>
