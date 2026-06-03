@@ -25,5 +25,16 @@ export async function GET() {
     allRespo.push(...respos);
     page++;
   }
-  return NextResponse.json({ repos: allRespo }, { status: 200 });
+    return NextResponse.json(allRespo.map(r => ({
+        id: r.id,
+        name: r.name,
+        full_name: r.full_name,
+        private: r.private,
+        html_url: r.html_url,
+        description: r.description,
+        updated_at: r.updated_at,
+        language: r.language,
+        default_branch: r.default_branch,
+        owner: r.owner.login
+    })));
 }
