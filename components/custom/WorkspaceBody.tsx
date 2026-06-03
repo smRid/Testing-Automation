@@ -43,7 +43,7 @@ function WorkspaceBody() {
                 <h2 className='text-[25px] font-medium leading-tight tracking-normal'>Connect Github & Add Repository</h2>
             </div>
             <div>
-                {!token ? <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer' onClick={OnAddRepo}>Connect</Button>: <RepoDialog/>}
+                {!token ? <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer' onClick={OnAddRepo}>Connect</Button>: <RepoDialog setRefreshPage={(refresh: boolean) => console.log(refresh)} />}
             </div>
         </Card>
 
