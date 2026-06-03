@@ -8,6 +8,7 @@ import { Button } from '../ui/button';
 import EmptyWorkspace from './EmptyWorkspace';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import RepoDialog from './RepoDialog';
 
 function WorkspaceBody() {
 
@@ -42,7 +43,7 @@ function WorkspaceBody() {
                 <h2 className='text-[25px] font-medium leading-tight tracking-normal'>Connect Github & Add Repository</h2>
             </div>
             <div>
-                {!token ? <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer' onClick={OnAddRepo}>Connect</Button>: <Button>+Add Repo</Button>}
+                {!token ? <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer' onClick={OnAddRepo}>Connect</Button>: <RepoDialog/>}
             </div>
         </Card>
 
