@@ -9,8 +9,9 @@ import EmptyWorkspace from './EmptyWorkspace';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import RepoDialog, { Repo } from './RepoDialog';
+import UserRepoList from './UserRepoList';
 
-type UserRepo={
+export type UserRepo={
     id:number;
     repoId:number;
     name:string;
@@ -54,6 +55,7 @@ function WorkspaceBody() {
     const GetUserAddedRepoList=async()=>{
         const result=await axios.get('/api/user-repo?userId='+userDetail?.id);
         console.log(result.data);
+        setUserRepoList(result.data);
     }
 
   return (
@@ -76,7 +78,8 @@ function WorkspaceBody() {
         <Card className='mt-[51px] min-h-[370px] rounded-[12px] border-[#dedede] bg-white text-black shadow-[0_2px_5px_rgba(0,0,0,0.13)]'>
             <CardContent>
             {!userRepoList ? <EmptyWorkspace />
-                : null}
+                : <UserRepoList repoList={userRepoList} />
+            }
             </CardContent>
         </Card>
     </div>
