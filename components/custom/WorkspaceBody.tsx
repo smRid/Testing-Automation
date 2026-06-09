@@ -8,27 +8,38 @@ import { Button } from '../ui/button';
 import EmptyWorkspace from './EmptyWorkspace';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import RepoDialog from './RepoDialog';
+import RepoDialog, { Repo } from './RepoDialog';
 
 function WorkspaceBody() {
 
     const { userDetail } = useContext(UserDetailContext);
     const router = useRouter()
     const [token, setToken] = useState('');
+    const [userRepoList,setUserRepoList] = useState<Repo[]>([]);
 
     useEffect(() => {
         GetGithubUserToken();
+
     }, [])
 
+    useEffect(()=>{
+        userDetail&& GetUserAddedRepoList();
+    },[userDetail])
+
     const GetGithubUserToken = async () => {
-    const result = await axios.get('/api/github/token');
-    console.log(result.data.token)
-    setToken(result.data.token);
+        const result = await axios.get('/api/github/token');
+        console.log(result.data.token)
+        setToken(result.data.token);
     }
 
     const OnAddRepo = async () => {
         router.push('/api/github');
-}
+    }
+
+    const GetUserAddedRepoList=async()=>{
+        const result=await axios.get('/api/user-repo?userId='+userDetail?.id);
+        console.log(result.data);
+    }
 
   return (
     <div className='w-full'>

@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     const result = await db.select().from(repositories).where(
         //@ts-ignore
-        eq(repositories.userId, userId ?? 0)
+        eq(repositories.userId, userId)
     )
 
     return NextResponse.json(result);
