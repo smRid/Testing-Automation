@@ -2,7 +2,7 @@
 
 import { UserDetailContext } from '@/context/UserDetailContext'
 import React, { useContext, useEffect, useState } from 'react'
-import { Card } from '../ui/card';
+import { Card, CardContent } from '../ui/card';
 import Image from 'next/image';
 import { Button } from '../ui/button';
 import EmptyWorkspace from './EmptyWorkspace';
@@ -10,12 +10,27 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import RepoDialog, { Repo } from './RepoDialog';
 
+type UserRepo={
+    id:number;
+    repoId:number;
+    name:string;
+    full_name:string;
+    private_:boolean;
+    html_url:string;
+    description:string;
+    userId:number;
+    owner:string;
+    updatedAt:string;
+    language:string;
+    default_branch:string;
+}
+
 function WorkspaceBody() {
 
     const { userDetail } = useContext(UserDetailContext);
     const router = useRouter()
     const [token, setToken] = useState('');
-    const [userRepoList,setUserRepoList] = useState<Repo[]>([]);
+    const [userRepoList,setUserRepoList] = useState<UserRepo[]>([]);
 
     useEffect(() => {
         GetGithubUserToken();
@@ -59,7 +74,10 @@ function WorkspaceBody() {
         </Card>
 
         <Card className='mt-[51px] min-h-[370px] rounded-[12px] border-[#dedede] bg-white text-black shadow-[0_2px_5px_rgba(0,0,0,0.13)]'>
-            <EmptyWorkspace/>
+            <CardContent>
+            {!userRepoList ? <EmptyWorkspace />
+                : null}
+            </CardContent>
         </Card>
     </div>
   )
