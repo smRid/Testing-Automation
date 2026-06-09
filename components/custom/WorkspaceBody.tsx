@@ -15,15 +15,15 @@ export type UserRepo={
     id:number;
     repoId:number;
     name:string;
-    full_name:string;
-    private_:boolean;
-    html_url:string;
+    fullName:string;
+    private:boolean;
+    htmlUrl:string;
     description:string;
     userId:number;
     owner:string;
     updatedAt:string;
     language:string;
-    default_branch:string;
+    defaultBranch:string;
 }
 
 function WorkspaceBody() {
@@ -71,16 +71,18 @@ function WorkspaceBody() {
                 <h2 className='text-[25px] font-medium leading-tight tracking-normal'>Connect Github & Add Repository</h2>
             </div>
             <div>
-                {!token ? <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer' onClick={OnAddRepo}>Connect</Button>: <RepoDialog setRefreshPage={(refresh: boolean) => console.log(refresh)} />}
+                {!token ? <Button className='h-[48px] rounded-[8px] px-[21px] text-[16px] font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.25)] cursor-pointer' onClick={OnAddRepo}>Connect</Button>: <RepoDialog setRefreshPage={() =>GetUserAddedRepoList()} />}
             </div>
         </Card>
 
-        <Card className='mt-[51px] min-h-[370px] rounded-[12px] border-[#dedede] bg-white text-black shadow-[0_2px_5px_rgba(0,0,0,0.13)]'>
-            <CardContent>
-            {!userRepoList ? <EmptyWorkspace />
-                : <UserRepoList repoList={userRepoList} />
+        <Card className='mt-10 min-h-[370px] rounded-[12px] border-0 bg-white text-black shadow-[0_2px_5px_rgba(0,0,0,0.13)]'>
+            {!userRepoList ? <Card className='mt-10'>
+                <CardContent>
+                    <EmptyWorkspace />
+                </CardContent>
+            </Card> : 
+                <UserRepoList repoList={userRepoList} />
             }
-            </CardContent>
         </Card>
     </div>
   )

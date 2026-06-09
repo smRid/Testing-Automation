@@ -72,6 +72,8 @@ function RepoDialog({setRefreshPage}: {setRefreshPage:(refresh:boolean)=>void}) 
       description: selectedRepo.description,
       userId: userDetail.id,
       owner: selectedRepo.owner,
+      language: selectedRepo.language,
+      default_branch: selectedRepo.default_branch,
     })
     console.log(result.data)
     setIsOpen(false);

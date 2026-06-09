@@ -1,10 +1,11 @@
 import { db, repositories } from "@/db";
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 
 export async function POST(req: NextRequest) {
     try {
-        const { repoId, userId, name, full_name, private_, html_url, description, owner } = await req.json();
+        const { repoId, userId, name, full_name, private_, html_url, description, owner, language, default_branch } = await req.json();
 
         if (!repoId || !userId || !name || !full_name || !html_url || !owner) {
             return NextResponse.json({ error: "Missing required repository fields" }, { status: 400 });
@@ -18,7 +19,9 @@ export async function POST(req: NextRequest) {
             private: private_ ? 1 : 0,
             htmlUrl: html_url,
             description,
-            owner
+            owner,
+            language,
+            defaultBranch: default_branch
         }).returning();
 
         return NextResponse.json(result[0]);

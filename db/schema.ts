@@ -26,6 +26,8 @@ export const repositories = pgTable("repositories", {
   htmlUrl: text("html_url").notNull(),
   description: text("description"),
   owner: text("owner").notNull(),
+  language: text("language"),
+  defaultBranch: text("default_branch"),
 })
 
 export type User = typeof users.$inferSelect;
