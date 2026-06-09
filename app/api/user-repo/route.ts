@@ -28,3 +28,16 @@ export async function POST(req: NextRequest) {
     }
 
 }
+
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url);
+
+    const userId = searchParams.get("userId");
+
+    const result = await db.select().from(repositories).where(
+        //@ts-ignore
+        eq(repositories.userId, userId ?? 0)
+    )
+
+    return NextResponse.json(result);
+}
