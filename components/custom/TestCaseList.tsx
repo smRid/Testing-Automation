@@ -6,6 +6,7 @@ import { Button } from '../ui/button'
 import { Checkbox } from '../ui/checkbox'
 import { TestCase } from './UserRepoList'
 import { useState } from 'react'
+import TestCaseSettingDialog from './TestCaseSettingDialog'
 
 type Props = {
     testCases: TestCase[]
@@ -28,7 +29,7 @@ function TestCaseList({ testCases,onReload }: Props) {
         <div>
             <div className='flex items-center justify-between'>
                 <h2 className='font-medium'>Generated Test Cases</h2>
-                <Button size={'sm'} onClick={()=> onReload(testCases[0]?.repoId)} > <RefreshCw className='h-3 w-3 mr-1' /> Refresh </Button>
+                <Button size="sm" onClick={()=> onReload(testCases[0]?.repoId)} > <RefreshCw className='h-3 w-3 mr-1' /> Refresh </Button>
             </div>
             <div className='border rounded-md'>
                 {testCases.map((testCase, index) => (
@@ -45,9 +46,7 @@ function TestCaseList({ testCases,onReload }: Props) {
                         <div className='gap-4 flex'>
                             <Badge variant={'secondary'}>{testCase?.type}</Badge>
                             <Badge variant={'secondary'}>Pending</Badge>
-                            <Button size={'icon'} variant={'outline'}>
-                                <SettingsIcon className='h-4 w-4 text-green-500 bg-white rounded-full' />
-                            </Button>
+                            <TestCaseSettingDialog/>
                         </div>
                     </div>
                 ))}
