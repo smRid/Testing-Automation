@@ -46,7 +46,7 @@ function TestCaseList({ testCases,onReload }: Props) {
                         <div className='gap-4 flex'>
                             <Badge variant={'secondary'}>{testCase?.type}</Badge>
                             <Badge variant={'secondary'}>Pending</Badge>
-                            <TestCaseSettingDialog/>
+                            <TestCaseSettingDialog testCase={testCase} setReload={onReload} />
                         </div>
                     </div>
                 ))}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -13,8 +13,42 @@ import { SettingsIcon } from 'lucide-react'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { DialogClose } from '@radix-ui/react-dialog'
+import { TestCase } from './UserRepoList'
+import axios from 'axios'
 
-function TestCaseSettingDialog() {
+type props = {
+    testCase?: TestCase
+    setReload: any
+}
+
+function TestCaseSettingDialog({ testCase, setReload }: props) {
+
+    const [formTestCase,setFormTestCase]=useState({
+        title: testCase?.title || '',
+        description: testCase?.description || '',
+        targetRoute: testCase?.targetRoute || '',
+        expectedResult: testCase?.expectedResult || ''
+    });
+
+
+
+    const handleInputChange = (fieldName: string, value: string) => {
+
+        setFormTestCase((prev) => ({
+            ...prev,
+            [fieldName]: value
+        }))
+    }
+
+    const updateCase = async () => {
+        const result = await axios.post('/api/test-cases/settings', {
+            ...formTestCase,
+            testCaseId: testCase?.id
+        });
+        console.log(result?.data);
+        setReload();
+    }
+
     return (
         <Dialog>
             <DialogTrigger>
@@ -32,25 +66,37 @@ function TestCaseSettingDialog() {
                 <div>
                     <div>
                         <label className='text-gray-400'>TEST TITLE</label>
-                        <Input placeholder='Test Title' className='mt-1' />
+                        <Input 
+                        value={formTestCase?.title} 
+                        onChange={(event)=>handleInputChange('title',event?.target?.value)}
+                        placeholder='Test Title' className='mt-1' />
                     </div>
                 </div>
                 <div>
                     <div className='mt-3'>
                         <label className='text-gray-400'>DESCRIPTION/ACTION</label>
-                        <Textarea placeholder='Description' className='mt-1' />
+                        <Textarea 
+                        value={formTestCase?.description} 
+                        onChange={(event)=>handleInputChange('description',event?.target?.value)}
+                        placeholder='Description' className='mt-1' />
                     </div>
                 </div>
                 <div>
                     <div className='mt-3'>
                         <label className='text-gray-400'>TARGET ROUTE/PATH</label>
-                        <Input placeholder='Target Route' className='mt-1' />
+                        <Input 
+                        value={formTestCase?.targetRoute} 
+                        onChange={(event)=>handleInputChange('targetRoute',event?.target?.value)}
+                        placeholder='Target Route' className='mt-1' />
                     </div>
                 </div>
                 <div>
                     <div className='mt-3'>
                         <label className='text-gray-400'>EXPECTED RESULT (JSON)</label>
-                        <Textarea placeholder='Expected Result' className='mt-1' />
+                        <Textarea 
+                        value={formTestCase?.expectedResult} 
+                        onChange={(event)=>handleInputChange('expectedResult',event?.target?.value)}
+                        placeholder='Expected Result' className='mt-1' />
                     </div>
                 </div>
                 <DialogFooter>
@@ -59,7 +105,7 @@ function TestCaseSettingDialog() {
                             Cancel
                         </Button>
                     </DialogClose>
-                    <Button>Update Case</Button>
+                    <Button onClick={updateCase}>Update Case</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
