@@ -24,6 +24,7 @@ export type UserRepo={
     updatedAt:string;
     language:string;
     defaultBranch:string;
+    targetDomain:string;
 }
 
 function WorkspaceBody() {

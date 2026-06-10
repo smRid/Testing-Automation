@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion"
 import Image from 'next/image'
 import { Button } from '../ui/button'
-import { CheckCircle2, ListChecks, Loader2, Loader2Icon, Sparkles, TrendingUp, XCircle } from 'lucide-react'
+import { CheckCircle2, Globe2Icon, Link2Icon, ListChecks, Loader2, Loader2Icon, Settings2, Sparkles, TrendingUp, XCircle } from 'lucide-react'
 import { UserDetailContext } from '@/context/UserDetailContext'
 import axios from 'axios'
 import TestCaseList from './TestCaseList'
@@ -53,7 +53,7 @@ const [loading, setLoading] = useState(false);
 const [testCaseLoading, setTestCaseLoading] = useState(false);
 const [testCases, setTestCases] = useState<TestCase[]>([]);
 const handleGenerateTestCases = async (repo: UserRepo) => {
-    // Implement the logic to call the API route to generate test cases for
+    // Implement the logic to call the API route to generate test cases 
     setLoading(true) 
     const result = await axios.post('/api/generate-test-cases', {
         userId: userDetail?.id,
@@ -102,6 +102,14 @@ const GetTestCases = async (repoId: number) => {
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
+                        <div className=' bg-gray-50 p-3 border rounded-xl flex items-center justify-between'>
+                            <div className='flex gap-3 items-center'>
+                                <Link2Icon className='text-green-700'/>
+                                <h2>Target Domain:</h2>
+                                <h2 className='bg-white p-1 px-2 border rounded-md font-medium text-green-700'>{repo?.targetDomain}</h2>
+                            </div>
+                            <Button> <Settings2 className='h-4 w-4 mr-1' /> Project Config</Button>
+                        </div>
                         <div className='pt-4 space-y-5'>
                             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
 
