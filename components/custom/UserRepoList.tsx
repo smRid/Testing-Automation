@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion"
 import Image from 'next/image'
 import { Button } from '../ui/button'
-import { CheckCircle2, ListChecks, Loader2, Sparkles, TrendingUp, XCircle } from 'lucide-react'
+import { CheckCircle2, ListChecks, Loader2, Loader2Icon, Sparkles, TrendingUp, XCircle } from 'lucide-react'
 import { UserDetailContext } from '@/context/UserDetailContext'
 import axios from 'axios'
 
@@ -26,7 +26,9 @@ function UserRepoList({repoList}:props) {
     : 0
 
 const { userDetail } = useContext(UserDetailContext);
-const [loading, setLoading ] = useState(false) 
+const [loading, setLoading] = useState(false);
+const [testCaseLoading, setTestCaseLoading] = useState(false);
+const [testCases, setTestCases] = useState([]);
 const handleGenerateTestCases = async (repo: UserRepo) => {
     // Implement the logic to call the API route to generate test cases for
     setLoading(true) 
@@ -41,12 +43,22 @@ const handleGenerateTestCases = async (repo: UserRepo) => {
         setLoading(false) 
 }
 
+const GetTestCases = async (repoId: number) => {
+    // Implement the logic to fetch test cases for the selected repository
+    setTestCaseLoading(true);
+    setTestCases([]);
+    const result = await axios.get(`/api/test-cases?repoId=${repoId}`);
+    console.log(result.data);
+    setTestCases(result.data);
+    setTestCaseLoading(false);
+}
+
   return (
     <div>
         <h2 className='text-[25px] font-medium leading-tight tracking-normal mt-3 mb-4'>Repositories</h2>
-    {repoList.map((repo, index) => (
-            <Accordion type="single" collapsible defaultValue="item-1" key={index}>
-                <AccordionItem value="item-1" className='border px-5 rounded-xl'>
+        <Accordion type="single" collapsible defaultValue="item-1" onValueChange={(value)=> GetTestCases(Number(value))}>
+            {repoList.map((repo, index) => (
+                <AccordionItem key={`${repo.repoId}-${index}`} value={(repo.repoId).toString()} className='border px-5 rounded-xl'>
                     <AccordionTrigger>
                         <div className='flex items-center gap-5'>
                             <Image src={'/github.svg'} alt='github' width={20} height={20} />
@@ -90,6 +102,10 @@ const handleGenerateTestCases = async (repo: UserRepo) => {
                                     bgColor="bg-purple-50"
                                 />
                             </div>
+                            {testCaseLoading?
+                                <h2> <Loader2Icon className='animate-spin'/> Please Wait... </h2>
+                                :
+                            
 
                             <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border rounded-xl p-4 bg-gray-50'>
                                 <div>
@@ -105,12 +121,12 @@ const handleGenerateTestCases = async (repo: UserRepo) => {
                                     <Sparkles className='h-4 w-4' />
                                     {loading ? <Loader2 className='animate-spin' />: 'Generate Test Cases'}
                                 </Button>
-                            </div>
+                            </div>}
                         </div>
                     </AccordionContent>
                 </AccordionItem>
-            </Accordion>
         ))}
+        </Accordion>
     </div>
   )
 }
