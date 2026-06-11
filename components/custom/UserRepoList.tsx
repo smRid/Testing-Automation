@@ -13,6 +13,7 @@ import { CheckCircle2, Globe2Icon, Link2Icon, ListChecks, Loader2, Loader2Icon, 
 import { UserDetailContext } from '@/context/UserDetailContext'
 import axios from 'axios'
 import TestCaseList from './TestCaseList'
+import RepoSettings from './RepoSettings'
 
 type props = {
     repoList:UserRepo[]
@@ -108,7 +109,8 @@ const GetTestCases = async (repoId: number) => {
                                 <h2>Target Domain:</h2>
                                 <h2 className='bg-white p-1 px-2 border rounded-md font-medium text-green-700'>{repo?.targetDomain}</h2>
                             </div>
-                            <Button> <Settings2 className='h-4 w-4 mr-1' /> Project Config</Button>
+                            <RepoSettings />
+                            
                         </div>
                         <div className='pt-4 space-y-5'>
                             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
