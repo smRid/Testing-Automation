@@ -52,7 +52,12 @@ function TestCaseSettingDialog({ testCase, setReload }: props) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button size={'icon'} variant={'outline'} className='h-8 w-8 rounded-lg border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700'>
+                <Button
+                    size='icon'
+                    variant='outline'
+                    aria-label={`Edit ${testCase?.title || 'test case'}`}
+                    className='h-8 w-8 rounded-lg border-blue-200 bg-blue-50 text-blue-600 shadow-sm transition-all duration-200 hover:border-blue-300 hover:bg-blue-100 hover:text-blue-800'
+                >
                     <SettingsIcon className='h-4 w-4' />
                 </Button>
             </DialogTrigger>

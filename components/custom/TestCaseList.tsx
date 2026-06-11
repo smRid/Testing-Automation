@@ -48,26 +48,45 @@ function TestCaseList({ testCases, repository, onReload }: Props) {
                 </Button>
             </div>
             <div>
-                {testCases.map((testCase) => (
-                    <div key={testCase.id} className='group flex flex-col gap-3 border-b border-slate-100 px-4 py-4 transition-colors duration-200 last:border-b-0 hover:bg-blue-50/40 sm:flex-row sm:items-center sm:justify-between sm:px-5'>
+                {testCases.map((testCase) => {
+                    const isSelected = selectedTestCases.some((item) => item.id === testCase.id);
+
+                    return (
+                    <div
+                        key={testCase.id}
+                        className={`group relative flex flex-col gap-3 border-b px-4 py-4 transition-colors duration-200 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-5 ${
+                            isSelected
+                                ? 'border-blue-100 bg-blue-50/70 before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-blue-600'
+                                : 'border-slate-100 bg-white hover:bg-slate-50/80'
+                        }`}
+                    >
                         <div className='flex min-w-0 items-start gap-3 sm:items-center'>
                             <Checkbox 
-                            checked={selectedTestCases.some((item) => item.id === testCase.id)}
-                            onCheckedChange={(checked)=>handleSelectedTestCase(checked,testCase)} className='mt-0.5 rounded-md border-slate-300 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 sm:mt-0' />
+                            checked={isSelected}
+                            aria-label={`Select ${testCase.title}`}
+                            onCheckedChange={(checked)=>handleSelectedTestCase(checked,testCase)}
+                            className='mt-0.5 h-[18px] w-[18px] rounded-md border-slate-300 bg-white text-white shadow-sm transition-all hover:border-blue-400 focus-visible:ring-blue-500 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white sm:mt-0'
+                            />
                             <div className='min-w-0'>
-                                <h2 className='text-sm font-semibold text-slate-900 transition-colors group-hover:text-blue-800'>{testCase?.title}</h2>
+                                <h2 className={`text-sm font-semibold transition-colors ${isSelected ? 'text-blue-950' : 'text-slate-900 group-hover:text-blue-800'}`}>{testCase?.title}</h2>
                                 <p className='mt-1 line-clamp-2 text-xs leading-5 text-slate-500 sm:line-clamp-1'>{testCase?.description}</p>
                             </div>
                         </div>
                         <div className='flex shrink-0 items-center gap-2 pl-7 sm:pl-0'>
-                            <Badge variant={'secondary'} className='border border-slate-200 bg-slate-50 text-[10px] font-semibold uppercase tracking-wide text-slate-600 hover:bg-slate-50'>{testCase?.type}</Badge>
+                            <Badge
+                                variant='outline'
+                                className={`text-[10px] font-semibold uppercase tracking-wide ${getTestTypeBadgeClassName(testCase.type)}`}
+                            >
+                                {testCase?.type}
+                            </Badge>
                             {testCase?.status=='failed'&& <Badge variant={'destructive'} className='border border-red-200 bg-red-50 text-[10px] capitalize text-red-700 hover:bg-red-50'>{testCase?.status}</Badge>}
                             {testCase?.status=='passed'&& <Badge variant={'default'} className='border border-emerald-200 bg-emerald-50 text-[10px] capitalize text-emerald-700 hover:bg-emerald-50'>{testCase?.status}</Badge>}
                             {testCase?.status=='running'&& <Badge variant={'default'} className='border border-amber-200 bg-amber-50 text-[10px] capitalize text-amber-700 hover:bg-amber-50'>{testCase?.status}</Badge>}
                             <TestCaseSettingDialog testCase={testCase} setReload={onReload} />
                         </div>
                     </div>
-                ))}
+                    );
+                })}
                 <div className='flex flex-col gap-3 bg-slate-50/90 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5'>
                     <div>
                         <h2 className='text-sm font-semibold text-slate-900'>Run Selected Test Cases</h2>
@@ -93,3 +112,28 @@ function TestCaseList({ testCases, repository, onReload }: Props) {
 }
 
 export default TestCaseList
+
+function getTestTypeBadgeClassName(type: string) {
+    const normalizedType = type.toLowerCase().trim();
+
+    if (normalizedType === 'ui') {
+        return 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50';
+    }
+    if (normalizedType === 'auth') {
+        return 'border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-50';
+    }
+    if (normalizedType === 'api') {
+        return 'border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-50';
+    }
+    if (normalizedType === 'form') {
+        return 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-50';
+    }
+    if (normalizedType === 'integration') {
+        return 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50';
+    }
+    if (normalizedType === 'edge-case') {
+        return 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-50';
+    }
+
+    return 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-50';
+}
