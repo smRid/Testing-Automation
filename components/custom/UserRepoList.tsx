@@ -17,6 +17,7 @@ import RepoSettings from './RepoSettings'
 
 type props = {
     repoList:UserRepo[]
+    setReload:()=>void;
 }
 
 export type TestCase={
@@ -40,7 +41,7 @@ type StatusData={
 }
 
 
-function UserRepoList({repoList}:props) {
+function UserRepoList({repoList,setReload}:props) {
     const [statusData, setStatusData] = useState<StatusData>({
     totalTests: 0,
     passedTests: 0,
@@ -109,7 +110,7 @@ const GetTestCases = async (repoId: number) => {
                                 <h2>Target Domain:</h2>
                                 <h2 className='bg-white p-1 px-2 border rounded-md font-medium text-green-700'>{repo?.targetDomain}</h2>
                             </div>
-                            <RepoSettings />
+                            <RepoSettings repo={repo} setReload={setReload}/>
                             
                         </div>
                         <div className='pt-4 space-y-5'>
