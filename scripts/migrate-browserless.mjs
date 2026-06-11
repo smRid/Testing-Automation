@@ -31,6 +31,9 @@ await sql.query(`
 
 await sql.query(`
   ALTER TABLE "test_cases"
+  ADD COLUMN IF NOT EXISTS "logs" jsonb DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS "session_id" varchar(255),
+  ADD COLUMN IF NOT EXISTS "session_url" varchar(500),
   ADD COLUMN IF NOT EXISTS "screenshot_data" text,
   ADD COLUMN IF NOT EXISTS "video_data" text,
   ADD COLUMN IF NOT EXISTS "trace_data" text,
@@ -47,6 +50,9 @@ const columns = await sql.query(`
     AND table_name = 'test_cases'
     AND column_name IN (
       'browserless_script',
+      'logs',
+      'session_id',
+      'session_url',
       'screenshot_data',
       'video_data',
       'trace_data',

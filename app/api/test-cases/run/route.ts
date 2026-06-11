@@ -93,7 +93,7 @@ function buildBrowserlessUrl(enableVideo: boolean) {
     throw new Error("BROWSERLESS_API_KEY is not configured");
   }
 
-  endpoint.searchParams.set("timeout", process.env.BROWSERLESS_TIMEOUT || "180000");
+  endpoint.searchParams.set("timeout", process.env.BROWSERLESS_TIMEOUT || "60000");
   endpoint.searchParams.set("headless", "false");
 
   if (enableVideo) {
@@ -307,7 +307,14 @@ async function stopVideoRecording(cdp: CDPSession | null, logs: string[]) {
       }
     );
 
-    return response.value ? Buffer.from(response.value, "base64") : null;
+    if (!response.value) {
+      logs.push(
+        "[WARN] Browserless stopped recording but returned no video data. Screen recording may not be enabled for this account."
+      );
+      return null;
+    }
+
+    return Buffer.from(response.value, "base64");
   } catch (error) {
     logs.push(
       `[WARN] Browserless video could not be saved: ${error instanceof Error ? error.message : String(error)}`
