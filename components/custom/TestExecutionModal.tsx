@@ -292,19 +292,19 @@ export default function TestExecutionModal({
         }
       }}
     >
-      <DialogContent className="flex h-[90vh] max-w-6xl flex-col gap-4 overflow-hidden rounded-2xl border bg-white p-6 shadow-2xl">
-        <DialogHeader className="shrink-0 border-b pb-4">
-          <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900">
-            <PlayCircle className="h-6 w-6 text-primary" />
+      <DialogContent className="flex h-[96dvh] w-[calc(100vw-0.75rem)] max-w-6xl flex-col gap-3 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl sm:h-[94dvh] sm:w-[calc(100vw-2rem)] sm:gap-4 sm:p-5 lg:h-[90vh] lg:overflow-hidden lg:p-6">
+        <DialogHeader className="shrink-0 border-b border-slate-200 pb-3 sm:pb-4">
+          <DialogTitle className="flex items-center gap-2 pr-7 text-lg font-bold text-slate-900 sm:text-2xl">
+            <PlayCircle className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
             Browserless Cloud Test Runner
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogDescription className="text-xs leading-5 text-slate-500 sm:text-sm">
             Generate or reuse Playwright scripts, run them in Browserless, and retain
             execution artifacts.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex shrink-0 flex-col gap-3 rounded-2xl border border-gray-200/80 bg-gray-50 p-4">
+        <div className="flex shrink-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
           <div className="flex flex-col items-end gap-4 sm:flex-row">
             <div className="flex-1 space-y-1.5">
               <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -316,16 +316,16 @@ export default function TestExecutionModal({
                 value={baseUrl}
                 onChange={(event) => setBaseUrl(event.target.value)}
                 disabled={isExecuting}
-                className="h-10 border-gray-300 bg-white font-mono text-sm"
+                className="h-10 rounded-xl border-slate-200 bg-white font-mono text-xs focus-visible:border-blue-400 focus-visible:ring-blue-100 sm:text-sm"
               />
             </div>
 
-            <div className="flex gap-2.5">
+            <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:gap-2.5">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setShowOptions((visible) => !visible)}
-                className="h-10 gap-1.5 border-gray-300 px-4 text-xs font-medium"
+                className="h-10 w-full gap-1.5 rounded-xl border-slate-200 bg-white px-4 text-xs font-medium text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 sm:w-auto"
               >
                 <SlidersHorizontal className="h-4 w-4" />
                 Execution Options
@@ -341,7 +341,7 @@ export default function TestExecutionModal({
                   type="button"
                   variant="destructive"
                   onClick={stopExecution}
-                  className="h-10 gap-2 px-6 font-medium"
+                  className="h-10 w-full gap-2 rounded-xl px-6 font-medium sm:w-auto"
                 >
                   <Square className="h-4 w-4 fill-current" />
                   Stop Runner
@@ -351,7 +351,7 @@ export default function TestExecutionModal({
                   type="button"
                   onClick={startExecution}
                   disabled={!baseUrl.trim() || testCases.length === 0}
-                  className="h-10 gap-2 px-6 font-medium text-white shadow-md"
+                  className="h-10 w-full gap-2 rounded-xl bg-blue-600 px-6 font-medium text-white shadow-md hover:bg-blue-700 sm:w-auto"
                 >
                   <Play className="h-4 w-4 fill-current" />
                   Start Execution
@@ -361,7 +361,7 @@ export default function TestExecutionModal({
           </div>
 
           {showOptions && (
-            <div className="grid grid-cols-1 gap-5 border-t border-gray-200/60 pt-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 border-t border-slate-200 pt-3 md:grid-cols-3">
               <div className="space-y-1.5">
                 <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
                   Run Mode
@@ -413,8 +413,8 @@ export default function TestExecutionModal({
           )}
         </div>
 
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 md:grid-cols-3">
-          <div className="flex flex-col gap-2 overflow-y-auto rounded-xl border bg-gray-50/50 p-3 shadow-sm">
+        <div className="grid flex-none grid-cols-1 gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-3 lg:gap-5">
+          <div className="flex max-h-64 flex-col gap-2 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/60 p-3 shadow-sm lg:max-h-none">
             <h3 className="mb-1 px-2 text-xs font-bold uppercase tracking-wider text-gray-400">
               Execution Queue
             </h3>
@@ -459,7 +459,7 @@ export default function TestExecutionModal({
             })}
           </div>
 
-          <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border bg-white shadow-sm md:col-span-2">
+          <div className="flex min-h-[420px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm lg:col-span-2 lg:min-h-0">
             {selectedTestCase ? (
               <>
                 <div className="flex shrink-0 items-start justify-between gap-4 border-b bg-gray-50/50 p-4">
@@ -560,12 +560,12 @@ export default function TestExecutionModal({
           </div>
         </div>
 
-        <div className="flex shrink-0 justify-end border-t pt-4">
+        <div className="flex shrink-0 justify-end border-t border-slate-200 pt-3 sm:pt-4">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isExecuting}
-            className="h-10 px-5 font-medium"
+            className="h-10 w-full rounded-xl border-slate-200 px-5 font-medium sm:w-auto"
           >
             Close & Refresh Status
           </Button>
