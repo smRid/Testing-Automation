@@ -292,7 +292,7 @@ export default function TestExecutionModal({
         }
       }}
     >
-      <DialogContent className="flex h-[96dvh] w-[calc(100vw-0.75rem)] max-w-6xl flex-col gap-3 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl sm:h-[94dvh] sm:w-[calc(100vw-2rem)] sm:gap-4 sm:p-5 lg:h-[90vh] lg:overflow-hidden lg:p-6">
+      <DialogContent className="flex h-[96dvh] w-[calc(100vw-0.75rem)] max-w-6xl flex-col gap-3 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-2xl [&>button]:text-slate-500 [&>button:hover]:bg-slate-100 [&>button]:data-[state=open]:bg-slate-100 [&>button]:data-[state=open]:text-slate-500 sm:h-[94dvh] sm:w-[calc(100vw-2rem)] sm:gap-4 sm:p-5 lg:h-[90vh] lg:overflow-hidden lg:p-6">
         <DialogHeader className="shrink-0 border-b border-slate-200 pb-3 sm:pb-4">
           <DialogTitle className="flex items-center gap-2 pr-7 text-lg font-bold text-slate-900 sm:text-2xl">
             <PlayCircle className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
@@ -307,8 +307,8 @@ export default function TestExecutionModal({
         <div className="flex shrink-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
           <div className="flex flex-col items-end gap-4 sm:flex-row">
             <div className="flex-1 space-y-1.5">
-              <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                <Globe className="h-3.5 w-3.5 text-primary" />
+              <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <Globe className="h-3.5 w-3.5 text-blue-600" />
                 Target Website URL
               </label>
               <Input
@@ -341,7 +341,7 @@ export default function TestExecutionModal({
                   type="button"
                   variant="destructive"
                   onClick={stopExecution}
-                  className="h-10 w-full gap-2 rounded-xl px-6 font-medium sm:w-auto"
+                  className="h-10 w-full gap-2 rounded-xl bg-rose-600 px-6 font-medium text-white hover:bg-rose-700 sm:w-auto"
                 >
                   <Square className="h-4 w-4 fill-current" />
                   Stop Runner
@@ -363,18 +363,18 @@ export default function TestExecutionModal({
           {showOptions && (
             <div className="grid grid-cols-1 gap-5 border-t border-slate-200 pt-3 md:grid-cols-3">
               <div className="space-y-1.5">
-                <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                   Run Mode
                 </span>
-                <div className="grid grid-cols-2 rounded-lg border border-gray-200 bg-gray-200/60 p-1">
+                <div className="grid grid-cols-2 rounded-lg border border-slate-200 bg-slate-100 p-1">
                   <button
                     type="button"
                     disabled={isExecuting}
                     onClick={() => setExecutionMode("cache")}
                     className={`flex items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-semibold ${
                       executionMode === "cache"
-                        ? "bg-white text-gray-800 shadow-sm"
-                        : "text-gray-500"
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "text-slate-500 hover:text-slate-700"
                     } disabled:opacity-50`}
                   >
                     <Database className="h-3.5 w-3.5" />
@@ -386,8 +386,8 @@ export default function TestExecutionModal({
                     onClick={() => setExecutionMode("generate")}
                     className={`flex items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-semibold ${
                       executionMode === "generate"
-                        ? "bg-white text-gray-800 shadow-sm"
-                        : "text-gray-500"
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "text-slate-500 hover:text-slate-700"
                     } disabled:opacity-50`}
                   >
                     <Sparkles className="h-3.5 w-3.5 text-yellow-600" />
@@ -397,7 +397,7 @@ export default function TestExecutionModal({
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                   Custom Generation Instructions
                 </span>
                 <textarea
@@ -406,7 +406,7 @@ export default function TestExecutionModal({
                   onChange={(event) => setCustomPrompt(event.target.value)}
                   disabled={isExecuting || executionMode === "cache"}
                   rows={2}
-                  className="w-full resize-none rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs text-slate-900 caret-blue-600 shadow-sm outline-none placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary disabled:bg-gray-100 disabled:opacity-50"
+                  className="w-full resize-none rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-900 caret-blue-600 shadow-sm outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -415,7 +415,7 @@ export default function TestExecutionModal({
 
         <div className="grid flex-none grid-cols-1 gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-3 lg:gap-5">
           <div className="flex max-h-64 flex-col gap-2 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/60 p-3 shadow-sm lg:max-h-none">
-            <h3 className="mb-1 px-2 text-xs font-bold uppercase tracking-wider text-gray-400">
+            <h3 className="mb-1 px-2 text-xs font-bold uppercase tracking-wider text-slate-500">
               Execution Queue
             </h3>
             {testCases.map((testCase, index) => {
@@ -430,23 +430,26 @@ export default function TestExecutionModal({
                   onClick={() => setSelectedDetailId(testCase.id)}
                   className={`rounded-lg border p-3 text-left transition-all ${
                     isActive
-                      ? "border-primary bg-white shadow-sm ring-1 ring-primary/20"
-                      : "border-gray-200 bg-white shadow-sm hover:border-gray-300"
+                      ? "border-blue-500 bg-white shadow-sm ring-1 ring-blue-100"
+                      : "border-slate-200 bg-white shadow-sm hover:border-slate-300"
                   }`}
                 >
                   <div className="mb-1 flex items-start justify-between gap-2">
-                    <h4 className="line-clamp-1 text-sm font-semibold text-gray-800">
+                    <h4 className="line-clamp-1 text-sm font-semibold text-slate-800">
                       {testCase.title}
                     </h4>
                     <ChevronRight
-                      className={`h-4 w-4 text-gray-400 ${isActive ? "rotate-90 text-primary" : ""}`}
+                      className={`h-4 w-4 text-slate-400 ${isActive ? "rotate-90 text-blue-600" : ""}`}
                     />
                   </div>
-                  <p className="mb-2.5 line-clamp-1 text-xs text-gray-400">
+                  <p className="mb-2.5 line-clamp-1 text-xs text-slate-500">
                     {testCase.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-[10px] capitalize">
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] capitalize ${getTestTypeBadgeClassName(testCase.type)}`}
+                    >
                       {testCase.type}
                     </Badge>
                     <StatusBadge
@@ -462,14 +465,14 @@ export default function TestExecutionModal({
           <div className="flex min-h-[420px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm lg:col-span-2 lg:min-h-0">
             {selectedTestCase ? (
               <>
-                <div className="flex shrink-0 items-start justify-between gap-4 border-b bg-gray-50/50 p-4">
+                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-slate-50/70 p-4">
                   <div>
-                    <h3 className="font-bold text-gray-800">{selectedTestCase.title}</h3>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <h3 className="font-bold text-slate-800">{selectedTestCase.title}</h3>
+                    <p className="mt-1 text-xs text-slate-500">
                       Expected: {selectedTestCase.expectedResult || "No expected result supplied"}
                     </p>
                     {selectedResult?.durationMs !== undefined && (
-                      <p className="mt-1 text-[11px] text-gray-400">
+                      <p className="mt-1 text-[11px] text-slate-400">
                         Completed in {(selectedResult.durationMs / 1000).toFixed(1)}s
                       </p>
                     )}
@@ -479,7 +482,7 @@ export default function TestExecutionModal({
                       asChild
                       variant="outline"
                       size="sm"
-                      className="shrink-0 gap-1 border-primary/30 text-xs text-primary"
+                      className="shrink-0 gap-1 border-blue-200 bg-white text-xs text-blue-700 hover:bg-blue-50 hover:text-blue-800"
                     >
                       <a
                         href={selectedResult.sessionUrl}
@@ -501,9 +504,9 @@ export default function TestExecutionModal({
 
                   {selectedResult?.browserlessScript && (
                     <div className="overflow-hidden rounded-lg border">
-                      <div className="flex items-center justify-between border-b bg-gray-100 px-3.5 py-2">
-                        <span className="flex items-center gap-1.5 text-xs font-semibold text-gray-600">
-                          <Code className="h-3.5 w-3.5 text-primary" />
+                      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100 px-3.5 py-2">
+                        <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
+                          <Code className="h-3.5 w-3.5 text-blue-600" />
                           Browserless Playwright Script
                         </span>
                       </div>
@@ -519,7 +522,11 @@ export default function TestExecutionModal({
                         <Terminal className="h-3.5 w-3.5" />
                         Console Terminal Output
                       </span>
-                      <Badge className="border-none bg-gray-800 text-[10px] uppercase text-gray-300">
+                      <Badge
+                        className={`border text-[10px] uppercase ${getTerminalStatusClassName(
+                          selectedResult?.status || "idle"
+                        )}`}
+                      >
                         {selectedResult?.status || "idle"}
                       </Badge>
                     </div>
@@ -553,8 +560,8 @@ export default function TestExecutionModal({
               </>
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
-                <Terminal className="mb-3 h-12 w-12 text-gray-300" />
-                <h3 className="text-lg font-bold text-gray-700">No Test Case Selected</h3>
+                <Terminal className="mb-3 h-12 w-12 text-slate-300" />
+                <h3 className="text-lg font-bold text-slate-700">No Test Case Selected</h3>
               </div>
             )}
           </div>
@@ -565,7 +572,7 @@ export default function TestExecutionModal({
             variant="outline"
             onClick={onClose}
             disabled={isExecuting}
-            className="h-10 w-full rounded-xl border-slate-200 px-5 font-medium sm:w-auto"
+            className="h-10 w-full rounded-xl border-slate-300 bg-white px-5 font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 sm:w-auto"
           >
             Close & Refresh Status
           </Button>
@@ -614,12 +621,18 @@ function ArtifactLinks({
         const size = metadata?.[item.key]?.size;
 
         return (
-          <Button key={item.key} asChild variant="outline" size="sm" className="gap-1.5 text-xs">
+          <Button
+            key={item.key}
+            asChild
+            variant="outline"
+            size="sm"
+            className="gap-1.5 border-slate-300 bg-white text-xs text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+          >
             <a href={item.href} target="_blank" rel="noreferrer">
               <Icon className="h-3.5 w-3.5" />
               {item.label}
               {size ? ` (${formatBytes(size)})` : ""}
-              <Download className="h-3 w-3 text-gray-400" />
+              <Download className="h-3 w-3 text-slate-400" />
             </a>
           </Button>
         );
@@ -638,6 +651,51 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function getTestTypeBadgeClassName(type: string) {
+  const normalizedType = type.toLowerCase().trim();
+
+  if (normalizedType === "ui") {
+    return "border-blue-200 bg-blue-50 text-blue-700";
+  }
+  if (normalizedType === "auth") {
+    return "border-violet-200 bg-violet-50 text-violet-700";
+  }
+  if (normalizedType === "api") {
+    return "border-cyan-200 bg-cyan-50 text-cyan-700";
+  }
+  if (normalizedType === "form") {
+    return "border-amber-200 bg-amber-50 text-amber-700";
+  }
+  if (normalizedType === "integration") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  }
+  if (normalizedType === "edge-case") {
+    return "border-rose-200 bg-rose-50 text-rose-700";
+  }
+
+  return "border-slate-200 bg-slate-50 text-slate-700";
+}
+
+function getTerminalStatusClassName(status: RunStatus) {
+  if (status === "generating") {
+    return "border-blue-800 bg-blue-950 text-blue-300 hover:bg-blue-950";
+  }
+  if (status === "running") {
+    return "border-amber-800 bg-amber-950 text-amber-300 hover:bg-amber-950";
+  }
+  if (status === "passed") {
+    return "border-emerald-800 bg-emerald-950 text-emerald-300 hover:bg-emerald-950";
+  }
+  if (status === "failed") {
+    return "border-rose-800 bg-rose-950 text-rose-300 hover:bg-rose-950";
+  }
+  if (status === "cancelled") {
+    return "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-800";
+  }
+
+  return "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-800";
+}
+
 function StatusBadge({
   status,
   isRunning,
@@ -647,7 +705,7 @@ function StatusBadge({
 }) {
   if (isRunning || status === "running") {
     return (
-      <Badge className="flex items-center gap-1 border-none bg-amber-100 text-amber-800">
+      <Badge className="flex items-center gap-1 border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-50">
         <Loader2 className="h-3 w-3 animate-spin" />
         Running
       </Badge>
@@ -656,7 +714,7 @@ function StatusBadge({
 
   if (status === "generating") {
     return (
-      <Badge className="flex items-center gap-1 border-none bg-blue-100 text-blue-800">
+      <Badge className="flex items-center gap-1 border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50">
         <Loader2 className="h-3 w-3 animate-spin" />
         Generating
       </Badge>
@@ -665,7 +723,7 @@ function StatusBadge({
 
   if (status === "passed") {
     return (
-      <Badge className="flex items-center gap-1 border-none bg-emerald-100 text-emerald-800">
+      <Badge className="flex items-center gap-1 border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50">
         <CheckCircle2 className="h-3 w-3" />
         Passed
       </Badge>
@@ -674,7 +732,7 @@ function StatusBadge({
 
   if (status === "failed") {
     return (
-      <Badge className="flex items-center gap-1 border-none bg-rose-100 text-rose-800">
+      <Badge className="flex items-center gap-1 border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-50">
         <XCircle className="h-3 w-3" />
         Failed
       </Badge>
@@ -683,14 +741,14 @@ function StatusBadge({
 
   if (status === "cancelled") {
     return (
-      <Badge variant="secondary" className="text-gray-600">
+      <Badge className="border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-100">
         Stopped
       </Badge>
     );
   }
 
   return (
-    <Badge variant="secondary" className="text-gray-600">
+    <Badge className="border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-100">
       Queued
     </Badge>
   );
