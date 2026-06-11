@@ -5,5 +5,5 @@ export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get('gh_token')?.value
 
-  return NextResponse.json({token:token})
+  return NextResponse.json({ connected: Boolean(token) })
 }

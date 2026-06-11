@@ -57,12 +57,12 @@ const RepoSettings = ({repo, setReload}:props) => {
             <div className="space-y-5">
                 <div>
                     <label className='text-xs font-bold uppercase tracking-wider text-slate-500'>App URL / Default website</label>
-                    <Input placeholder='App URL or domain' value={repoSettings.targetDomain} onChange={(e) => setRepoSettings({...repoSettings, targetDomain: e.target.value})} className='mt-2 h-11 rounded-xl border-slate-200 bg-slate-50/70 px-4 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
+                    <Input placeholder='App URL or domain' value={repoSettings.targetDomain} onChange={(e) => setRepoSettings({...repoSettings, targetDomain: e.target.value})} className='mt-2 h-11 rounded-xl border-slate-200 bg-slate-50/70 px-4 text-slate-900 caret-blue-600 placeholder:text-slate-400 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
                     <p className='mt-2 text-xs leading-5 text-slate-500'>The target address where automated headless browsers will connect and run test cases.</p>
                 </div>
                 <div>
                     <label className='text-xs font-bold uppercase tracking-wider text-slate-500'>Global test instruction</label>
-                    <Textarea placeholder='Instructions' value={repoSettings.globalInstruction} onChange={(e) => setRepoSettings({...repoSettings, globalInstruction: e.target.value})} className='mt-2 min-h-28 rounded-xl border-slate-200 bg-slate-50/70 px-4 py-3 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
+                    <Textarea placeholder='Instructions' value={repoSettings.globalInstruction} onChange={(e) => setRepoSettings({...repoSettings, globalInstruction: e.target.value})} className='mt-2 min-h-28 rounded-xl border-slate-200 bg-slate-50/70 px-4 py-3 text-slate-900 caret-blue-600 placeholder:text-slate-400 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
                     <p className='mt-2 text-xs leading-5 text-slate-500'>These instructions will be given to the AI agent to generate relevant test cases.</p>
                 </div>
             </div>

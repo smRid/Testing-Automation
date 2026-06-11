@@ -316,7 +316,7 @@ export default function TestExecutionModal({
                 value={baseUrl}
                 onChange={(event) => setBaseUrl(event.target.value)}
                 disabled={isExecuting}
-                className="h-10 rounded-xl border-slate-200 bg-white font-mono text-xs focus-visible:border-blue-400 focus-visible:ring-blue-100 sm:text-sm"
+                className="h-10 rounded-xl border-slate-200 bg-white font-mono text-xs text-slate-900 caret-blue-600 placeholder:text-slate-400 focus-visible:border-blue-400 focus-visible:ring-blue-100 sm:text-sm"
               />
             </div>
 
@@ -406,7 +406,7 @@ export default function TestExecutionModal({
                   onChange={(event) => setCustomPrompt(event.target.value)}
                   disabled={isExecuting || executionMode === "cache"}
                   rows={2}
-                  className="w-full resize-none rounded-md border border-gray-300 px-3 py-1.5 text-xs shadow-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:bg-gray-100 disabled:opacity-50"
+                  className="w-full resize-none rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs text-slate-900 caret-blue-600 shadow-sm outline-none placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary disabled:bg-gray-100 disabled:opacity-50"
                 />
               </div>
             </div>

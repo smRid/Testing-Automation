@@ -69,28 +69,28 @@ function TestCaseSettingDialog({ testCase, setReload }: props) {
                         <Input 
                         value={formTestCase?.title} 
                         onChange={(event)=>handleInputChange('title',event?.target?.value)}
-                        placeholder='Test Title' className='mt-2 h-11 rounded-xl border-slate-200 bg-slate-50/70 px-4 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
+                        placeholder='Test Title' className='mt-2 h-11 rounded-xl border-slate-200 bg-slate-50/70 px-4 text-slate-900 caret-blue-600 placeholder:text-slate-400 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
                     </div>
                     <div>
                         <label className='text-xs font-bold uppercase tracking-wider text-slate-500'>Description / Action</label>
                         <Textarea 
                         value={formTestCase?.description} 
                         onChange={(event)=>handleInputChange('description',event?.target?.value)}
-                        placeholder='Description' className='mt-2 min-h-24 rounded-xl border-slate-200 bg-slate-50/70 px-4 py-3 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
+                        placeholder='Description' className='mt-2 min-h-24 rounded-xl border-slate-200 bg-slate-50/70 px-4 py-3 text-slate-900 caret-blue-600 placeholder:text-slate-400 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
                     </div>
                     <div>
                         <label className='text-xs font-bold uppercase tracking-wider text-slate-500'>Target route / Path</label>
                         <Input 
                         value={formTestCase?.targetRoute} 
                         onChange={(event)=>handleInputChange('targetRoute',event?.target?.value)}
-                        placeholder='Target Route' className='mt-2 h-11 rounded-xl border-slate-200 bg-slate-50/70 px-4 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
+                        placeholder='Target Route' className='mt-2 h-11 rounded-xl border-slate-200 bg-slate-50/70 px-4 text-slate-900 caret-blue-600 placeholder:text-slate-400 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
                     </div>
                     <div>
                         <label className='text-xs font-bold uppercase tracking-wider text-slate-500'>Expected result</label>
                         <Textarea 
                         value={formTestCase?.expectedResult} 
                         onChange={(event)=>handleInputChange('expectedResult',event?.target?.value)}
-                        placeholder='Expected Result' className='mt-2 min-h-24 rounded-xl border-slate-200 bg-slate-50/70 px-4 py-3 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
+                        placeholder='Expected Result' className='mt-2 min-h-24 rounded-xl border-slate-200 bg-slate-50/70 px-4 py-3 text-slate-900 caret-blue-600 placeholder:text-slate-400 focus-visible:border-blue-400 focus-visible:ring-blue-100' />
                     </div>
                 </div>
                 <DialogFooter className="gap-2 sm:gap-3">

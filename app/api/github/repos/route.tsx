@@ -1,31 +1,89 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+type GitHubRepository = {
+  id: number;
+  name: string;
+  full_name: string;
+  private: boolean;
+  html_url: string;
+  description: string | null;
+  updated_at: string;
+  language: string | null;
+  default_branch: string;
+  owner: {
+    login: string;
+  };
+};
+
 export async function GET() {
   const cookiesStore = await cookies();
   const token = cookiesStore.get('gh_token')?.value;
 
   if (!token) {
-    return NextResponse.json(JSON.stringify({ error: 'Github token not found' }), { status: 401 });
+    return NextResponse.json(
+      { error: 'GitHub connection not found. Please reconnect GitHub.' },
+      { status: 401 }
+    );
   }
 
-  const allRespo = [];
+  const allRepos: GitHubRepository[] = [];
   let page = 1;
 
   while (true) {
     const res = await fetch(`https://api.github.com/user/repos?per_page=100&page=${page}&sort=updated`, {
       headers: {
         Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json'
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'Testing-Automation'
+      },
+      cache: 'no-store'
+    });
+
+    const data: unknown = await res.json();
+
+    if (!res.ok) {
+      const githubMessage =
+        typeof data === 'object' &&
+        data !== null &&
+        'message' in data &&
+        typeof data.message === 'string'
+          ? data.message
+          : 'Unable to load GitHub repositories.';
+
+      const response = NextResponse.json(
+        {
+          error:
+            res.status === 401
+              ? 'GitHub connection expired. Please reconnect GitHub.'
+              : githubMessage,
+        },
+        { status: res.status === 401 ? 401 : 502 }
+      );
+
+      if (res.status === 401) {
+        response.cookies.delete('gh_token');
       }
+
+      return response;
     }
-    )
-    const respos=await res.json();
-    if(!respos.length) break;
-    allRespo.push(...respos);
+
+    if (!Array.isArray(data)) {
+      return NextResponse.json(
+        { error: 'GitHub returned an unexpected repository response.' },
+        { status: 502 }
+      );
+    }
+
+    const repos = data as GitHubRepository[];
+    if (repos.length === 0) break;
+
+    allRepos.push(...repos);
     page++;
   }
-    return NextResponse.json(allRespo.map(r => ({
+
+    return NextResponse.json(allRepos.map(r => ({
         id: r.id,
         name: r.name,
         full_name: r.full_name,

@@ -46,8 +46,7 @@ function WorkspaceBody() {
 
     const GetGithubUserToken = async () => {
         const result = await axios.get('/api/github/token');
-        console.log(result.data.token)
-        setToken(result.data.token);
+        setToken(result.data.connected ? 'connected' : '');
     }
 
     const OnAddRepo = async () => {

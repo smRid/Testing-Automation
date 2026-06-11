@@ -30,7 +30,7 @@ if(!token)
     response.cookies.set('gh_token',token,{
         httpOnly:true,
         secure:process.env.NODE_ENV==='production',
-        maxAge:60*60*24*30, //30 days
+        maxAge: typeof data.expires_in === 'number' ? data.expires_in : 60 * 60 * 8,
         path:'/',
         sameSite:'lax'
     });
