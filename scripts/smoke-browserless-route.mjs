@@ -87,7 +87,8 @@ assert(title.toLowerCase().includes("example domain"), "Example Domain title was
 
   if (!response.ok || result.status !== "passed") {
     throw new Error(
-      `Run route failed (${response.status}): ${result.error || JSON.stringify(result)}`
+      `Run route failed (${response.status}): ${result.error || JSON.stringify(result)}\n` +
+      `${Array.isArray(result.logs) ? result.logs.join("\n") : ""}`
     );
   }
 

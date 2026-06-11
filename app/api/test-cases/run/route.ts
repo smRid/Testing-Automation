@@ -15,6 +15,13 @@ import { repositories, TestCasesTable } from "@/db/schema";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+const DEFAULT_BROWSERLESS_SESSION_TIMEOUT_MS = 300_000;
+const DEFAULT_PLAYWRIGHT_ACTION_TIMEOUT_MS = 10_000;
+const DEFAULT_PLAYWRIGHT_NAVIGATION_TIMEOUT_MS = 20_000;
+const ANSI_ESCAPE_PATTERN =
+  // eslint-disable-next-line no-control-regex
+  /[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[-a-zA-Z\d/#&.:=?%@~_]+)*)?\u0007)|(?:(?:\d{1,4}(?:[;:]\d{0,4})*)?[\dA-PR-TZcf-nq-uy=><~]))/g;
+
 type RunMode = "cache" | "generate";
 
 type RunRequest = {
@@ -41,6 +48,48 @@ type BrowserlessLiveUrlResponse = {
 type BrowserlessRecordingResponse = {
   value?: string;
 };
+
+type ScriptRunner = (
+  page: Page,
+  assert: (condition: unknown, message?: string) => void,
+  console: {
+    log: (...args: unknown[]) => void;
+    error: (...args: unknown[]) => void;
+    warn: (...args: unknown[]) => void;
+  },
+  Buffer: typeof globalThis.Buffer
+) => Promise<void>;
+
+function getPositiveIntegerEnv(name: string, fallback: number) {
+  const value = Number(process.env[name]);
+  return Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
+function getBrowserlessSessionTimeoutMs() {
+  return getPositiveIntegerEnv(
+    "BROWSERLESS_TIMEOUT",
+    DEFAULT_BROWSERLESS_SESSION_TIMEOUT_MS
+  );
+}
+
+function getPlaywrightActionTimeoutMs() {
+  return getPositiveIntegerEnv(
+    "BROWSERLESS_ACTION_TIMEOUT",
+    DEFAULT_PLAYWRIGHT_ACTION_TIMEOUT_MS
+  );
+}
+
+function getPlaywrightNavigationTimeoutMs() {
+  return getPositiveIntegerEnv(
+    "BROWSERLESS_NAVIGATION_TIMEOUT",
+    DEFAULT_PLAYWRIGHT_NAVIGATION_TIMEOUT_MS
+  );
+}
+
+function cleanMessage(value: unknown) {
+  const message = value instanceof Error ? value.message : String(value);
+  return message.replace(ANSI_ESCAPE_PATTERN, "").trim();
+}
 
 async function sendBrowserlessCommand<T>(
   cdp: CDPSession,
@@ -93,7 +142,7 @@ function buildBrowserlessUrl(enableVideo: boolean) {
     throw new Error("BROWSERLESS_API_KEY is not configured");
   }
 
-  endpoint.searchParams.set("timeout", process.env.BROWSERLESS_TIMEOUT || "60000");
+  endpoint.searchParams.set("timeout", String(getBrowserlessSessionTimeoutMs()));
   endpoint.searchParams.set("headless", "false");
 
   if (enableVideo) {
@@ -103,6 +152,62 @@ function buildBrowserlessUrl(enableVideo: boolean) {
   }
 
   return endpoint.toString();
+}
+
+function getScriptValidationIssues(
+  script: string,
+  testCase: typeof TestCasesTable.$inferSelect,
+  targetUrl: string
+) {
+  const issues: string[] = [];
+
+  if (/\bexpect\s*\(/.test(script)) {
+    issues.push("Use the provided assert() helper instead of expect().");
+  }
+  if (/\bprocess\.env\b/.test(script)) {
+    issues.push(
+      "Do not read process.env. Runtime credentials are not exposed to generated scripts."
+    );
+  }
+  if (/\b(?:require\s*\(|import\s*(?:\(|[\s{*]))/.test(script)) {
+    issues.push("Do not import or require modules.");
+  }
+  if (/:(?:has-text|text)\(\s*\/[^/]+\/[a-z]*\s*\)/i.test(script)) {
+    issues.push(
+      "Do not place JavaScript regular expressions inside CSS selectors; use getByRole(), getByText(), or locator(..., { hasText })."
+    );
+  }
+  if (
+    (testCase.type === "api" || testCase.targetRoute?.startsWith("/api/")) &&
+    script.includes(`page.goto(${JSON.stringify(targetUrl)}`)
+  ) {
+    issues.push(
+      "Do not navigate to an API endpoint with page.goto(); use page.request with the endpoint's actual HTTP method."
+    );
+  }
+
+  return issues;
+}
+
+function compileScript(
+  script: string,
+  testCase: typeof TestCasesTable.$inferSelect,
+  targetUrl: string
+) {
+  const issues = getScriptValidationIssues(script, testCase, targetUrl);
+  if (issues.length > 0) {
+    throw new Error(`Generated script is not runnable: ${issues.join(" ")}`);
+  }
+
+  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as new (
+    ...args: string[]
+  ) => ScriptRunner;
+
+  try {
+    return new AsyncFunction("page", "assert", "console", "Buffer", script);
+  } catch (error) {
+    throw new Error(`Generated script has invalid JavaScript: ${cleanMessage(error)}`);
+  }
 }
 
 async function connectToBrowserless(logs: string[]) {
@@ -214,51 +319,80 @@ async function generateScript({
 
   const targetUrl = normalizeTargetUrl(baseUrl, testCase.targetRoute);
   const expectedResult = testCase.expectedResult || "";
-  const prompt = `
+  let validationFeedback = "";
+
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const prompt = `
 You are an expert QA automation engineer.
 Write a Playwright JavaScript script body for the test case below.
 
 Target URL: ${targetUrl}
 Title: ${testCase.title}
 Description: ${testCase.description}
+Type: ${testCase.type}
 Expected Result: ${expectedResult}
 
 ${globalInstruction ? `[GLOBAL PROJECT INSTRUCTIONS]\n${globalInstruction}\n` : ""}
 ${customPrompt ? `[ADDITIONAL RUNTIME INSTRUCTIONS]\n${customPrompt}\n` : ""}
+${validationFeedback ? `[PREVIOUS SCRIPT VALIDATION FAILURE]\n${validationFeedback}\nCorrect every listed issue.\n` : ""}
 
 Source file context:
 ${repoContext || "No source file context is available."}
 
-The script runs inside an async function with page, assert, and console already provided.
-Do not import modules or launch/connect a browser.
-Navigate with:
-await page.goto(${JSON.stringify(targetUrl)}, { waitUntil: "load", timeout: 15000 });
-Then wait briefly with await page.waitForTimeout(1000).
+Runtime contract:
+- The script runs inside an async function with only page, assert, console, and Buffer provided.
+- Do not use expect(), process.env, require(), import, browser launch, or browser connection APIs.
+- Use assert(condition, message) for every assertion. Do not await assert().
+- Do not invent credentials. If an authenticated success path needs credentials that are not present
+  in the source or instructions, detect the unavailable/disabled login state and throw a concise setup
+  error explaining what the target application must configure.
+- Use valid Playwright locators. Never put a JavaScript regex inside a CSS selector such as
+  button:has-text(/text/i). Prefer getByRole(), getByLabel(), getByPlaceholder(), or getByText().
+- Locators and expected labels must come from the supplied source context; do not invent UI text.
+- Before interacting, verify the target control is visible and enabled, and fail with a clear message
+  if the page is an authentication screen, configuration screen, or 404 page.
+- Keep each explicit action/wait timeout at or below 10000ms. Do not stack many fallback waits.
+- Log useful execution steps with console.log().
 
-Use resilient Playwright locators based on the source context. Wait for elements before interaction,
-scroll them into view, and add short waits after major actions. Use case-insensitive substring checks
-instead of strict text equality when possible. Log useful execution steps with console.log().
-Use the provided assert(condition, message) helper for assertions.
+For UI, auth, form, integration, and edge-case tests:
+- Navigate with await page.goto(${JSON.stringify(targetUrl)}, { waitUntil: "domcontentloaded", timeout: 20000 });
+- Wait briefly only when necessary; prefer Playwright's locator auto-waiting.
+
+For API tests:
+- Do not use page.goto() on the API URL.
+- Use page.request with the HTTP method, body, and content type shown by the route source.
+- Assert the intended success or validation response. A generic HTTP 500 must never count as a pass.
 
 Return raw executable JavaScript only. Do not use Markdown fences or add an explanation.
 `;
 
-  const ai = new GoogleGenAI({ apiKey });
-  const response = await ai.models.generateContent({
-    model: process.env.GEMINI_MODEL || "gemini-3.1-flash-lite",
-    contents: prompt,
-  });
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: process.env.GEMINI_MODEL || "gemini-3.1-flash-lite",
+      contents: prompt,
+    });
 
-  const script = (response.text || "")
-    .replace(/^```(?:javascript|js)?\s*/i, "")
-    .replace(/\s*```$/i, "")
-    .trim();
+    const script = (response.text || "")
+      .replace(/^```(?:javascript|js)?\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
 
-  if (!script) {
-    throw new Error("Gemini failed to generate an automation script");
+    if (!script) {
+      validationFeedback = "Gemini returned an empty script.";
+      continue;
+    }
+
+    try {
+      compileScript(script, testCase, targetUrl);
+      return script;
+    } catch (error) {
+      validationFeedback = cleanMessage(error);
+    }
   }
 
-  return script;
+  throw new Error(
+    validationFeedback || "Gemini failed to generate a runnable automation script"
+  );
 }
 
 function getArtifactUrls(testCaseId: number, metadata: ArtifactMetadata) {
@@ -412,10 +546,44 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const targetUrl = normalizeTargetUrl(baseUrl, testCase.targetRoute);
+  let runScript: ScriptRunner;
+
+  try {
+    runScript = compileScript(scriptText, testCase, targetUrl);
+  } catch (error) {
+    const message = cleanMessage(error);
+    const invalidScriptLogs = [`[SYSTEM ERROR] Script validation failed: ${message}`];
+
+    await db
+      .update(TestCasesTable)
+      .set({
+        status: "failed",
+        browserlessScript: scriptText,
+        logs: invalidScriptLogs,
+        completedAt: new Date(),
+      })
+      .where(eq(TestCasesTable.id, testCase.id));
+
+    return NextResponse.json(
+      {
+        error: `${message} Regenerate this test script before running it again.`,
+        status: "failed",
+        logs: invalidScriptLogs,
+        browserlessScript: scriptText,
+      },
+      { status: 422 }
+    );
+  }
+
+  const sessionTimeoutMs = getBrowserlessSessionTimeoutMs();
+  const actionTimeoutMs = getPlaywrightActionTimeoutMs();
+  const navigationTimeoutMs = getPlaywrightNavigationTimeoutMs();
   const logs: string[] = [
     shouldGenerate
       ? "[SYSTEM] Generated a new Playwright script and cached it in the database."
       : "[SYSTEM] Loaded the cached Playwright script from the database.",
+    `[SYSTEM] Browserless session budget: ${sessionTimeoutMs}ms; action timeout: ${actionTimeoutMs}ms; navigation timeout: ${navigationTimeoutMs}ms.`,
   ];
   const startedAt = new Date();
   const fallbackSessionId = randomUUID();
@@ -451,6 +619,7 @@ export async function POST(request: NextRequest) {
   let videoBuffer: Buffer | null = null;
   let traceBuffer: Buffer | null = null;
   let executionError: Error | null = null;
+  let browserDisconnected = false;
 
   const customConsole = {
     log: (...args: unknown[]) =>
@@ -465,6 +634,9 @@ export async function POST(request: NextRequest) {
     logs.push("[SYSTEM] Creating Browserless cloud session...");
     const connection = await connectToBrowserless(logs);
     browser = connection.browser;
+    browser.on("disconnected", () => {
+      browserDisconnected = true;
+    });
 
     context = browser.contexts()[0];
     if (!context) {
@@ -472,6 +644,8 @@ export async function POST(request: NextRequest) {
     }
 
     page = context.pages()[0] || (await context.newPage());
+    page.setDefaultTimeout(actionTimeoutMs);
+    page.setDefaultNavigationTimeout(navigationTimeoutMs);
     await page.setViewportSize({ width: 1440, height: 900 }).catch(() => undefined);
     cdp = await context.newCDPSession(page);
 
@@ -537,20 +711,31 @@ export async function POST(request: NextRequest) {
 
     logs.push("[SYSTEM] Connected to Browserless. Executing Playwright script...");
 
-    const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as new (
-      ...args: string[]
-    ) => (...functionArgs: unknown[]) => Promise<void>;
-    const runScript = new AsyncFunction("page", "assert", "console", scriptText);
     const assert = (condition: unknown, message?: string) => {
       if (!condition) {
         throw new Error(message || "Assertion failed");
       }
     };
 
-    await runScript(page, assert, customConsole);
+    await runScript(page, assert, customConsole, Buffer);
     logs.push("[SYSTEM] Script execution completed successfully.");
   } catch (error) {
-    executionError = error instanceof Error ? error : new Error(String(error));
+    const rawMessage = cleanMessage(error);
+    const elapsedMs = Date.now() - startedAt.getTime();
+    const closedUnexpectedly =
+      browserDisconnected ||
+      /target page, context or browser has been closed|browser.*(?:closed|disconnected)/i.test(
+        rawMessage
+      );
+
+    executionError = closedUnexpectedly
+      ? new Error(
+          `Browserless closed the remote session after ${(elapsedMs / 1000).toFixed(1)}s. ` +
+            `The requested session budget is ${sessionTimeoutMs}ms. Browserless Free sessions are limited to one minute; ` +
+            `use a plan with a longer session limit or keep the test below that limit. ` +
+            `Underlying error: ${rawMessage}`
+        )
+      : new Error(rawMessage);
     logs.push(`[SYSTEM ERROR] Script execution failed: ${executionError.message}`);
   } finally {
     if (page) {

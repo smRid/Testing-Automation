@@ -237,7 +237,15 @@ Each test case must include:
 Important rules:
 - Only use file paths that exist in the repository context.
 - Do not invent fake target files.
-- If route is unclear, infer from Next.js app/page structure.
+- targetRoute must correspond to a real route file in the repository context:
+  app/**/page.* or pages/** for browser UI, and app/api/**/route.* or pages/api/** for APIs.
+- Do not invent a route for a component that is not mapped to a real page.
+- Generate API tests only when the route source reveals the HTTP method and request shape.
+- Do not generate successful authenticated-flow, logout, or protected-page tests unless the repository
+  contains a deterministic test authentication setup that can run without secret credentials.
+- Prefer public UI behavior, unauthenticated validation, and API validation paths that Browserless can
+  execute deterministically.
+- A test must not treat HTTP 500 as a passing result.
 - Keep description short, only one line.
 - Return only valid JSON.
 `;
