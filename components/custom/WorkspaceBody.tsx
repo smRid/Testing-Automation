@@ -5,10 +5,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Card } from '../ui/card';
 import Image from 'next/image';
 import { Button } from '../ui/button';
-import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import RepoDialog from './RepoDialog';
 import UserRepoList from './UserRepoList';
+import { AlertCircle } from 'lucide-react';
 
 export type UserRepo={
     id:number;
@@ -27,13 +27,19 @@ export type UserRepo={
     globalInstruction?:string;
 }
 
-function WorkspaceBody() {
+function WorkspaceBody({ githubError }: { githubError?: string }) {
 
     const { userDetail } = useContext(UserDetailContext);
-    const router = useRouter()
     const [token, setToken] = useState('');
     const [userRepoList,setUserRepoList] = useState<UserRepo[]>([]);
     const [isRepoListLoading, setIsRepoListLoading] = useState(true);
+    const githubErrorMessage = githubError ? {
+        access_denied: 'GitHub authorization was cancelled.',
+        invalid_state: 'The GitHub authorization session expired. Please try connecting again.',
+        missing_code: 'GitHub did not return an authorization code. Please try again.',
+        oauth_not_configured: 'GitHub OAuth is not configured on this server.',
+        token_exchange_failed: 'GitHub could not complete the connection. Check the OAuth app callback URL and credentials.',
+    }[githubError] || 'GitHub connection failed. Please try again.' : '';
 
     useEffect(() => {
         GetGithubUserToken();
@@ -50,7 +56,7 @@ function WorkspaceBody() {
     }
 
     const OnAddRepo = async () => {
-        router.push('/api/github');
+        window.location.assign('/api/github');
     }
 
     const GetUserAddedRepoList=async()=>{
@@ -89,6 +95,13 @@ function WorkspaceBody() {
                 {!token ? <Button className='h-11 w-full cursor-pointer rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_12px_24px_rgba(37,99,235,0.28)] sm:w-auto' onClick={OnAddRepo}>Connect GitHub</Button>: <RepoDialog setRefreshPage={() =>GetUserAddedRepoList()} />}
             </div>
         </Card>
+
+        {githubErrorMessage && (
+            <div role="alert" className="mt-4 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{githubErrorMessage}</span>
+            </div>
+        )}
 
         <Card className='mt-7 min-h-[370px] rounded-2xl border border-slate-200/80 bg-white/95 p-4 text-slate-950 shadow-[0_12px_32px_rgba(15,23,42,0.06)] sm:p-6'>
             <UserRepoList
