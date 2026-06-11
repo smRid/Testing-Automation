@@ -2,10 +2,9 @@
 
 import { UserDetailContext } from '@/context/UserDetailContext'
 import React, { useContext, useEffect, useState } from 'react'
-import { Card, CardContent } from '../ui/card';
+import { Card } from '../ui/card';
 import Image from 'next/image';
 import { Button } from '../ui/button';
-import EmptyWorkspace from './EmptyWorkspace';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import RepoDialog from './RepoDialog';
@@ -34,6 +33,7 @@ function WorkspaceBody() {
     const router = useRouter()
     const [token, setToken] = useState('');
     const [userRepoList,setUserRepoList] = useState<UserRepo[]>([]);
+    const [isRepoListLoading, setIsRepoListLoading] = useState(true);
 
     useEffect(() => {
         GetGithubUserToken();
@@ -54,9 +54,14 @@ function WorkspaceBody() {
     }
 
     const GetUserAddedRepoList=async()=>{
-        const result=await axios.get('/api/user-repo?userId='+userDetail?.id);
-        console.log(result.data);
-        setUserRepoList(result.data);
+        setIsRepoListLoading(true);
+        try {
+            const result=await axios.get('/api/user-repo?userId='+userDetail?.id);
+            console.log(result.data);
+            setUserRepoList(result.data);
+        } finally {
+            setIsRepoListLoading(false);
+        }
     }
 
   return (
@@ -86,13 +91,11 @@ function WorkspaceBody() {
         </Card>
 
         <Card className='mt-7 min-h-[370px] rounded-2xl border border-slate-200/80 bg-white/95 p-4 text-slate-950 shadow-[0_12px_32px_rgba(15,23,42,0.06)] sm:p-6'>
-            {!userRepoList ? <Card className='mt-6 border-slate-200 shadow-none'>
-                <CardContent>
-                    <EmptyWorkspace />
-                </CardContent>
-            </Card> : 
-                <UserRepoList repoList={userRepoList}  setReload={()=>GetUserAddedRepoList()}/>
-            }
+            <UserRepoList
+                repoList={userRepoList}
+                isLoading={isRepoListLoading}
+                setReload={()=>GetUserAddedRepoList()}
+            />
         </Card>
     </div>
   )
