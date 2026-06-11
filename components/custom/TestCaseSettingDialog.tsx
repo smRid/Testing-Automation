@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -12,7 +13,6 @@ import { Button } from '../ui/button'
 import { SettingsIcon } from 'lucide-react'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
-import { DialogClose } from '@radix-ui/react-dialog'
 import { TestCase } from './UserRepoList'
 import axios from 'axios'
 
@@ -51,7 +51,7 @@ function TestCaseSettingDialog({ testCase, setReload }: props) {
 
     return (
         <Dialog>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button size={'icon'} variant={'outline'} className='bg-green-100 rounded-full text-green-600 border-none hover:bg-green-200 hover:text-green-700'>
                     <SettingsIcon className='h-4 w-4' />
                 </Button>
@@ -100,7 +100,7 @@ function TestCaseSettingDialog({ testCase, setReload }: props) {
                     </div>
                 </div>
                 <DialogFooter>
-                    <DialogClose>
+                    <DialogClose asChild>
                         <Button variant={'outline'}>
                             Cancel
                         </Button>

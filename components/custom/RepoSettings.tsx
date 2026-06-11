@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import {
   Dialog,
   DialogContent,
+  DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -13,7 +14,6 @@ import { Button } from '../ui/button'
 import { Settings2 } from 'lucide-react'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
-import { DialogClose } from '@radix-ui/react-dialog'
 import { UserRepo } from './WorkspaceBody';
 import axios from 'axios'
 type props = {
@@ -44,7 +44,7 @@ const RepoSettings = ({repo, setReload}:props) => {
     }
   return (
         <Dialog open={isOpen} onOpenChange={(open)=>setIsOpen(open)} >
-        <DialogTrigger>
+        <DialogTrigger asChild>
             <Button> <Settings2 className='h-4 w-4 mr-1' /> Project Config</Button>
         </DialogTrigger>
         <DialogContent>
@@ -67,7 +67,7 @@ const RepoSettings = ({repo, setReload}:props) => {
                 </div>
             </div>
             <DialogFooter>
-                <DialogClose>
+                <DialogClose asChild>
                     <Button variant={'outline'}>Cancel</Button>
                 </DialogClose>
                 <Button onClick={handleSaveSettings}>Save Config</Button>
