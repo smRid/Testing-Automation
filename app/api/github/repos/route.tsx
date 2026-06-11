@@ -1,5 +1,9 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+
+import {
+  deleteGitHubConnection,
+  getAuthenticatedGitHubConnection,
+} from "@/lib/github-connection";
 
 type GitHubRepository = {
   id: number;
@@ -17,10 +21,9 @@ type GitHubRepository = {
 };
 
 export async function GET() {
-  const cookiesStore = await cookies();
-  const token = cookiesStore.get('gh_token')?.value;
+  const connection = await getAuthenticatedGitHubConnection();
 
-  if (!token) {
+  if (!connection) {
     return NextResponse.json(
       { error: 'GitHub connection not found. Please reconnect GitHub.' },
       { status: 401 }
@@ -33,7 +36,7 @@ export async function GET() {
   while (true) {
     const res = await fetch(`https://api.github.com/user/repos?per_page=100&page=${page}&sort=updated`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${connection.accessToken}`,
         Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
         'User-Agent': 'Testing-Automation'
@@ -63,7 +66,7 @@ export async function GET() {
       );
 
       if (res.status === 401) {
-        response.cookies.delete('gh_token');
+        await deleteGitHubConnection(connection.clerkUserId);
       }
 
       return response;

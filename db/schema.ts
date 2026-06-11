@@ -32,6 +32,18 @@ export const repositories = pgTable("repositories", {
   globalInstruction: text("global_instruction"),
 })
 
+export const githubConnections = pgTable("github_connections", {
+  id: serial("id").primaryKey(),
+  clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull().unique(),
+  githubUserId: varchar("github_user_id", { length: 255 }).notNull(),
+  githubLogin: varchar("github_login", { length: 255 }).notNull(),
+  githubAvatarUrl: text("github_avatar_url"),
+  encryptedAccessToken: text("encrypted_access_token").notNull(),
+  scopes: text("scopes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const TestCasesTable = pgTable("test_cases", {
   id: serial("id").primaryKey(),
 

@@ -1,9 +1,17 @@
 import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
+import { getAuthenticatedClerkUserId } from "@/lib/github-connection";
+
 const OAUTH_STATE_COOKIE = "github_oauth_state";
+const OAUTH_USER_COOKIE = "github_oauth_user";
 
 export async function GET(req: NextRequest) {
+  const clerkUserId = await getAuthenticatedClerkUserId();
+  if (!clerkUserId) {
+    return NextResponse.redirect(new URL("/sign-in", req.url));
+  }
+
   const clientId = process.env.GITHUB_CLIENT_ID?.trim();
   const redirectUri = process.env.GITHUB_REDIRECT_URI?.trim();
 
@@ -19,6 +27,7 @@ export async function GET(req: NextRequest) {
     redirect_uri: redirectUri,
     scope: "repo read:user",
     state,
+    prompt: "select_account",
   });
 
   const response = NextResponse.redirect(
@@ -26,6 +35,13 @@ export async function GET(req: NextRequest) {
   );
 
   response.cookies.set(OAUTH_STATE_COOKIE, state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 10 * 60,
+    path: "/",
+    sameSite: "lax",
+  });
+  response.cookies.set(OAUTH_USER_COOKIE, clerkUserId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 10 * 60,

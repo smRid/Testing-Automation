@@ -10,6 +10,7 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate:browserless": "node --env-file=.env scripts/migrate-browserless.mjs",
+    "db:migrate:github": "node --env-file=.env scripts/migrate-github-connections.mjs",
     "db:studio": "drizzle-kit studio",
     "test:browserless-smoke": "node --env-file=.env scripts/smoke-browserless-route.mjs"
   },

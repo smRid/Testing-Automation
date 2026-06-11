@@ -1,9 +1,40 @@
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('gh_token')?.value
+import {
+  deleteGitHubConnection,
+  getAuthenticatedClerkUserId,
+  getGitHubConnectionForUser,
+} from "@/lib/github-connection";
 
-  return NextResponse.json({ connected: Boolean(token) })
+export async function GET() {
+  const clerkUserId = await getAuthenticatedClerkUserId();
+  if (!clerkUserId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const connection = await getGitHubConnectionForUser(clerkUserId);
+
+  return NextResponse.json({
+    connected: Boolean(connection),
+    account: connection
+      ? {
+          id: connection.githubUserId,
+          login: connection.githubLogin,
+          avatarUrl: connection.githubAvatarUrl,
+        }
+      : null,
+  });
+}
+
+export async function DELETE() {
+  const clerkUserId = await getAuthenticatedClerkUserId();
+  if (!clerkUserId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  await deleteGitHubConnection(clerkUserId);
+
+  const response = NextResponse.json({ connected: false });
+  response.cookies.delete("gh_token");
+  return response;
 }

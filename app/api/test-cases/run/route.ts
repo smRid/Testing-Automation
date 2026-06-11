@@ -6,11 +6,11 @@ import { join } from "path";
 import { GoogleGenAI } from "@google/genai";
 import { chromium, type Browser, type BrowserContext, type CDPSession, type Page } from "playwright-core";
 import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/db";
 import { repositories, TestCasesTable } from "@/db/schema";
+import { getAuthenticatedGitHubConnection } from "@/lib/github-connection";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -291,11 +291,11 @@ async function generateScript({
     throw new Error("GEMINI_API_KEY is not configured");
   }
 
-  const cookieStore = await cookies();
-  const githubToken = cookieStore.get("gh_token")?.value;
-  if (!githubToken) {
+  const githubConnection = await getAuthenticatedGitHubConnection();
+  if (!githubConnection) {
     throw new Error("GitHub authentication token is missing or expired");
   }
+  const githubToken = githubConnection.accessToken;
 
   const fileContents = await Promise.all(
     (testCase.targetFiles || []).map((path) =>

@@ -27,14 +27,23 @@ export type UserRepo={
     globalInstruction?:string;
 }
 
+type GitHubAccount = {
+    id: string;
+    login: string;
+    avatarUrl: string | null;
+}
+
 function WorkspaceBody({ githubError }: { githubError?: string }) {
 
     const { userDetail } = useContext(UserDetailContext);
-    const [token, setToken] = useState('');
+    const [githubAccount, setGitHubAccount] = useState<GitHubAccount | null>(null);
+    const [isDisconnecting, setIsDisconnecting] = useState(false);
     const [userRepoList,setUserRepoList] = useState<UserRepo[]>([]);
     const [isRepoListLoading, setIsRepoListLoading] = useState(true);
     const githubErrorMessage = githubError ? {
         access_denied: 'GitHub authorization was cancelled.',
+        account_changed: 'Your signed-in account changed during GitHub authorization. Please try again.',
+        identity_verification_failed: 'GitHub connected, but the account identity could not be verified.',
         invalid_state: 'The GitHub authorization session expired. Please try connecting again.',
         missing_code: 'GitHub did not return an authorization code. Please try again.',
         oauth_not_configured: 'GitHub OAuth is not configured on this server.',
@@ -51,12 +60,28 @@ function WorkspaceBody({ githubError }: { githubError?: string }) {
     },[userDetail])
 
     const GetGithubUserToken = async () => {
-        const result = await axios.get('/api/github/token');
-        setToken(result.data.connected ? 'connected' : '');
+        try {
+            const result = await axios.get<{ connected: boolean; account: GitHubAccount | null }>('/api/github/token');
+            setGitHubAccount(result.data.connected ? result.data.account : null);
+        } catch {
+            setGitHubAccount(null);
+        }
     }
 
-    const OnAddRepo = async () => {
+    const OnAddRepo = () => {
         window.location.assign('/api/github');
+    }
+
+    const DisconnectGitHub = async () => {
+        if (isDisconnecting) return;
+
+        setIsDisconnecting(true);
+        try {
+            await axios.delete('/api/github/token');
+            setGitHubAccount(null);
+        } finally {
+            setIsDisconnecting(false);
+        }
     }
 
     const GetUserAddedRepoList=async()=>{
@@ -92,7 +117,20 @@ function WorkspaceBody({ githubError }: { githubError?: string }) {
                 </div>
             </div>
             <div className='shrink-0'>
-                {!token ? <Button className='h-11 w-full cursor-pointer rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_12px_24px_rgba(37,99,235,0.28)] sm:w-auto' onClick={OnAddRepo}>Connect GitHub</Button>: <RepoDialog setRefreshPage={() =>GetUserAddedRepoList()} />}
+                {!githubAccount ? (
+                    <Button className='h-11 w-full cursor-pointer rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_12px_24px_rgba(37,99,235,0.28)] sm:w-auto' onClick={OnAddRepo}>Connect GitHub</Button>
+                ) : (
+                    <div className='flex flex-col items-stretch gap-2 sm:items-end'>
+                        <span className='text-xs font-medium text-slate-500'>Connected as <strong className='text-slate-800'>@{githubAccount.login}</strong></span>
+                        <div className='flex flex-wrap gap-2'>
+                            <RepoDialog setRefreshPage={() =>GetUserAddedRepoList()} />
+                            <Button type='button' variant='outline' className='h-11 rounded-xl' onClick={OnAddRepo}>Switch account</Button>
+                            <Button type='button' variant='ghost' className='h-11 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700' onClick={DisconnectGitHub} disabled={isDisconnecting}>
+                                {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </Card>
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { db } from "@/db/index";
 import { TestCasesTable } from "@/db/schema";
-import { cookies } from "next/headers";
+import { getAuthenticatedGitHubConnection } from "@/lib/github-connection";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
@@ -143,8 +143,8 @@ async function readGithubFile({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const cookiesStore = await cookies();
-    const githubToken = cookiesStore.get('gh_token')?.value;
+    const githubConnection = await getAuthenticatedGitHubConnection();
+    const githubToken = githubConnection?.accessToken;
 
     const {
       userId,
@@ -154,10 +154,17 @@ export async function POST(req: NextRequest) {
       branch = "main",
     } = body;
 
+    if (!githubConnection) {
+      return NextResponse.json(
+        { error: "GitHub connection not found. Please reconnect GitHub." },
+        { status: 401 }
+      );
+    }
+
     if (!userId || !owner || !repo || !githubToken) {
       return NextResponse.json(
         {
-          error: "userId, owner, repo and githubToken are required",
+          error: "userId, owner and repo are required",
         },
         { status: 400 }
       );
