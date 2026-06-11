@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import Provider from './provider';
 
 export const metadata: Metadata = {
-  title: "Next.js Premium Startup Boilerplate",
-  description: "Created using the ultimate interactive Next.js stack generator CLI.",
+  title: "TestFlow - AI Test Automation",
+  description: "Generate, run, and review automated tests from one workspace.",
 };
 
 export default function RootLayout({
@@ -17,8 +17,8 @@ export default function RootLayout({
     <ClerkProvider
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
-      signInFallbackRedirectUrl="/"
-      signUpFallbackRedirectUrl="/"
+      signInFallbackRedirectUrl="/loading-workspace"
+      signUpFallbackRedirectUrl="/loading-workspace"
     >
       <html lang="en">
         <body style={{ margin: 0, padding: 0 }}>
