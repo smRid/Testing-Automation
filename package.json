@@ -9,6 +9,7 @@
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
+    "db:migrate:browserless": "node --env-file=.env scripts/migrate-browserless.mjs",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^0.475.0",
     "next": "^16.2.6",
+    "playwright-core": "^1.60.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "stripe": "^22.1.1",

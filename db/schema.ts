@@ -48,16 +48,30 @@ export const TestCasesTable = pgTable("test_cases", {
   type: varchar("type", { length: 100 }).notNull(),
   priority: varchar("priority", { length: 50 }).notNull(),
 
-  // Important metadata for second step: Browserbase script generation
+  // Important metadata for Browserless script generation and execution
   targetRoute: varchar("target_route", { length: 500 }),
   targetFiles: jsonb("target_files").$type<string[]>().default([]),
   expectedResult: text("expected_result"),
 
-  // Later you can update these fields
-  browserbaseScript: text("browserbase_script"),
+  browserlessScript: text("browserless_script"),
   status: varchar("status", { length: 100 }).default("generated"),
 
   createdAt: timestamp("created_at").defaultNow(),
+
+  logs: jsonb("logs").$type<string[]>().default([]),
+  sessionId: varchar("session_id", { length: 255 }),
+  sessionUrl: varchar("session_url", { length: 500 }),
+  screenshotData: text("screenshot_data"),
+  videoData: text("video_data"),
+  traceData: text("trace_data"),
+  artifactMetadata: jsonb("artifact_metadata").$type<{
+    screenshot?: { mimeType: string; size: number };
+    video?: { mimeType: string; size: number };
+    trace?: { mimeType: string; size: number };
+  }>().default({}),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  durationMs: integer("duration_ms"),
 });
 
 export type User = typeof users.$inferSelect;

@@ -25,12 +25,25 @@ export type TestCase={
     title: string;
     description: string;
     type: string;
-    repoId: number;
+    priority: string;
+    repoId: string | number;
     targetFiles: string[];
-    expectedResult: string;
+    expectedResult: string | null;
     repoName: string;
     repoOwner: string;
-    targetRoute: string;
+    targetRoute: string | null;
+    branch: string | null;
+    status: string | null;
+    browserlessScript: string | null;
+    logs: string[] | null;
+    sessionId: string | null;
+    sessionUrl: string | null;
+    artifactMetadata: {
+        screenshot?: { mimeType: string; size: number };
+        video?: { mimeType: string; size: number };
+        trace?: { mimeType: string; size: number };
+    } | null;
+    durationMs: number | null;
 }
 
 type StatusData={
@@ -76,11 +89,16 @@ const GetTestCases = async (repoId: number) => {
     setTestCases([]);
     const result = await axios.get(`/api/test-cases?repoId=${repoId}`);
     console.log(result.data);
+    const userTestCases= result.data as TestCase[];
+    const passedTests=userTestCases?.filter(testCase=>testCase.status=='passed').length || 0;
+    const failedTests=userTestCases?.filter(testCase=>testCase.status=='failed').length || 0;
+    const passRate= userTestCases?.length ? Math.round((passedTests / userTestCases.length) * 100) : 0;
+    
     setStatusData({
     totalTests: result.data.length,
-    passedTests:0,
-    failedTests:0,
-    passRate:0
+    passedTests:passedTests,
+    failedTests:failedTests,
+    passRate:passRate
 })
     setTestCases(result.data);
     setTestCaseLoading(false);
@@ -145,7 +163,13 @@ const GetTestCases = async (repoId: number) => {
                                 />
                             </div>
 
-                            {!testCaseLoading && testCases.length > 0 && <TestCaseList testCases={testCases} onReload={(repoId:number) => GetTestCases(repoId)} />}
+                            {!testCaseLoading && testCases.length > 0 && (
+                                <TestCaseList
+                                    testCases={testCases}
+                                    repository={repo}
+                                    onReload={(repoId) => GetTestCases(Number(repoId))}
+                                />
+                            )}
 
                             {testCaseLoading?
                                 <h2 className='flex gap-3 items-center '> <Loader2Icon className='animate-spin'/> Please Wait... </h2>

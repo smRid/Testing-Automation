@@ -213,7 +213,7 @@ You are an expert QA automation engineer.
 Analyze the GitHub repository source code and generate useful small test cases.
 
 Your goal:
-Generate test cases that can later be converted into Playwright / Browserbase automation scripts.
+Generate test cases that can later be converted into Playwright / Browserless automation scripts.
 
 Repository:
 Owner: ${owner}
