@@ -15,7 +15,7 @@ import { getAuthenticatedGitHubConnection } from "@/lib/github-connection";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
-const DEFAULT_BROWSERLESS_SESSION_TIMEOUT_MS = 300_000;
+const FREE_TIER_BROWSERLESS_SESSION_TIMEOUT_MS = 55_000;
 const DEFAULT_PLAYWRIGHT_ACTION_TIMEOUT_MS = 10_000;
 const DEFAULT_PLAYWRIGHT_NAVIGATION_TIMEOUT_MS = 20_000;
 const ANSI_ESCAPE_PATTERN =
@@ -33,7 +33,6 @@ type RunRequest = {
 
 type ArtifactMetadata = {
   screenshot?: { mimeType: string; size: number };
-  video?: { mimeType: string; size: number };
   trace?: { mimeType: string; size: number };
 };
 
@@ -43,10 +42,6 @@ type BrowserlessPageIdResponse = {
 
 type BrowserlessLiveUrlResponse = {
   liveURL?: string;
-};
-
-type BrowserlessRecordingResponse = {
-  value?: string;
 };
 
 type ScriptRunner = (
@@ -66,9 +61,12 @@ function getPositiveIntegerEnv(name: string, fallback: number) {
 }
 
 function getBrowserlessSessionTimeoutMs() {
-  return getPositiveIntegerEnv(
-    "BROWSERLESS_TIMEOUT",
-    DEFAULT_BROWSERLESS_SESSION_TIMEOUT_MS
+  return Math.min(
+    getPositiveIntegerEnv(
+      "BROWSERLESS_TIMEOUT",
+      FREE_TIER_BROWSERLESS_SESSION_TIMEOUT_MS
+    ),
+    FREE_TIER_BROWSERLESS_SESSION_TIMEOUT_MS
   );
 }
 
@@ -124,7 +122,7 @@ function normalizeTargetUrl(baseUrl: string, targetRoute?: string | null) {
   return new URL(targetRoute || "/", parsedBase).toString();
 }
 
-function buildBrowserlessUrl(enableVideo: boolean) {
+function buildBrowserlessUrl() {
   const token = process.env.BROWSERLESS_API_KEY;
   const configuredUrl =
     process.env.BROWSERLESS_URL || "wss://production-sfo.browserless.io";
@@ -144,12 +142,7 @@ function buildBrowserlessUrl(enableVideo: boolean) {
 
   endpoint.searchParams.set("timeout", String(getBrowserlessSessionTimeoutMs()));
   endpoint.searchParams.set("headless", "false");
-
-  if (enableVideo) {
-    endpoint.searchParams.set("record", "true");
-  } else {
-    endpoint.searchParams.delete("record");
-  }
+  endpoint.searchParams.delete("record");
 
   return endpoint.toString();
 }
@@ -211,29 +204,8 @@ function compileScript(
 }
 
 async function connectToBrowserless(logs: string[]) {
-  const videoRequested = process.env.BROWSERLESS_ENABLE_VIDEO !== "false";
-
-  try {
-    const browser = await chromium.connectOverCDP(
-      buildBrowserlessUrl(videoRequested),
-      { timeout: 30_000 }
-    );
-    return { browser, videoEnabled: videoRequested };
-  } catch (error) {
-    if (!videoRequested) {
-      throw error;
-    }
-
-    logs.push(
-      `[WARN] Browserless video connection was unavailable; retrying without video recording. ${error instanceof Error ? error.message : String(error)}`
-    );
-
-    const browser = await chromium.connectOverCDP(
-      buildBrowserlessUrl(false),
-      { timeout: 30_000 }
-    );
-    return { browser, videoEnabled: false };
-  }
+  logs.push("[SYSTEM] Browserless free-tier mode enabled; video recording is disabled.");
+  return chromium.connectOverCDP(buildBrowserlessUrl(), { timeout: 30_000 });
 }
 
 async function readGithubFile({
@@ -400,9 +372,6 @@ function getArtifactUrls(testCaseId: number, metadata: ArtifactMetadata) {
     screenshot: metadata.screenshot
       ? `/api/test-cases/${testCaseId}/artifacts/screenshot`
       : undefined,
-    video: metadata.video
-      ? `/api/test-cases/${testCaseId}/artifacts/video`
-      : undefined,
     trace: metadata.trace
       ? `/api/test-cases/${testCaseId}/artifacts/trace`
       : undefined,
@@ -424,36 +393,6 @@ async function stopTrace(context: BrowserContext | null, tracePath: string, logs
     return null;
   } finally {
     await fs.unlink(tracePath).catch(() => undefined);
-  }
-}
-
-async function stopVideoRecording(cdp: CDPSession | null, logs: string[]) {
-  if (!cdp) {
-    return null;
-  }
-
-  try {
-    const response = await sendBrowserlessCommand<BrowserlessRecordingResponse>(
-      cdp,
-      "Browserless.stopRecording",
-      {
-      encoding: "base64",
-      }
-    );
-
-    if (!response.value) {
-      logs.push(
-        "[WARN] Browserless stopped recording but returned no video data. Screen recording may not be enabled for this account."
-      );
-      return null;
-    }
-
-    return Buffer.from(response.value, "base64");
-  } catch (error) {
-    logs.push(
-      `[WARN] Browserless video could not be saved: ${error instanceof Error ? error.message : String(error)}`
-    );
-    return null;
   }
 }
 
@@ -612,11 +551,9 @@ export async function POST(request: NextRequest) {
   let page: Page | null = null;
   let cdp: CDPSession | null = null;
   let traceStarted = false;
-  let recordingStarted = false;
   let sessionId: string = fallbackSessionId;
   let sessionUrl: string | null = null;
   let screenshotBuffer: Buffer | null = null;
-  let videoBuffer: Buffer | null = null;
   let traceBuffer: Buffer | null = null;
   let executionError: Error | null = null;
   let browserDisconnected = false;
@@ -632,8 +569,7 @@ export async function POST(request: NextRequest) {
 
   try {
     logs.push("[SYSTEM] Creating Browserless cloud session...");
-    const connection = await connectToBrowserless(logs);
-    browser = connection.browser;
+    browser = await connectToBrowserless(logs);
     browser.on("disconnected", () => {
       browserDisconnected = true;
     });
@@ -666,7 +602,7 @@ export async function POST(request: NextRequest) {
           cdp,
           "Browserless.liveURL",
           {
-            timeout: 180_000,
+            timeout: 50_000,
             interactable: false,
             resizable: false,
           }
@@ -696,17 +632,6 @@ export async function POST(request: NextRequest) {
       logs.push(
         `[WARN] Playwright tracing is unavailable: ${error instanceof Error ? error.message : String(error)}`
       );
-    }
-
-    if (connection.videoEnabled) {
-      try {
-        await sendBrowserlessCommand(cdp, "Browserless.startRecording");
-        recordingStarted = true;
-      } catch (error) {
-        logs.push(
-          `[WARN] Browserless video recording is unavailable: ${error instanceof Error ? error.message : String(error)}`
-        );
-      }
     }
 
     logs.push("[SYSTEM] Connected to Browserless. Executing Playwright script...");
@@ -752,13 +677,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (recordingStarted) {
-      videoBuffer = await stopVideoRecording(cdp, logs);
-      if (videoBuffer) {
-        logs.push("[SYSTEM] Saved Browserless WebM recording.");
-      }
-    }
-
     if (traceStarted) {
       traceBuffer = await stopTrace(context, tracePath, logs);
       if (traceBuffer) {
@@ -780,12 +698,6 @@ export async function POST(request: NextRequest) {
       size: screenshotBuffer.length,
     };
   }
-  if (videoBuffer) {
-    artifactMetadata.video = {
-      mimeType: "video/webm",
-      size: videoBuffer.length,
-    };
-  }
   if (traceBuffer) {
     artifactMetadata.trace = {
       mimeType: "application/zip",
@@ -802,7 +714,7 @@ export async function POST(request: NextRequest) {
       sessionId,
       sessionUrl,
       screenshotData: screenshotBuffer?.toString("base64") || null,
-      videoData: videoBuffer?.toString("base64") || null,
+      videoData: null,
       traceData: traceBuffer?.toString("base64") || null,
       artifactMetadata,
       completedAt,

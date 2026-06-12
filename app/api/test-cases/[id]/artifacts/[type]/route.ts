@@ -6,14 +6,13 @@ import { TestCasesTable } from "@/db/schema";
 
 export const runtime = "nodejs";
 
-type ArtifactType = "screenshot" | "video" | "trace";
+type ArtifactType = "screenshot" | "trace";
 
 const artifactConfig: Record<
   ArtifactType,
   { mimeType: string; extension: string }
 > = {
   screenshot: { mimeType: "image/png", extension: "png" },
-  video: { mimeType: "video/webm", extension: "webm" },
   trace: { mimeType: "application/zip", extension: "zip" },
 };
 
@@ -32,7 +31,6 @@ export async function GET(
   const [testCase] = await db
     .select({
       screenshotData: TestCasesTable.screenshotData,
-      videoData: TestCasesTable.videoData,
       traceData: TestCasesTable.traceData,
     })
     .from(TestCasesTable)
@@ -41,9 +39,7 @@ export async function GET(
   const encodedArtifact =
     artifactType === "screenshot"
       ? testCase?.screenshotData
-      : artifactType === "video"
-        ? testCase?.videoData
-        : testCase?.traceData;
+      : testCase?.traceData;
 
   if (!encodedArtifact) {
     return NextResponse.json({ error: "Artifact not found" }, { status: 404 });

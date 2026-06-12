@@ -21,7 +21,6 @@ import {
   Sparkles,
   Square,
   Terminal,
-  Video,
   XCircle,
 } from "lucide-react";
 
@@ -55,13 +54,11 @@ type RunStatus =
 
 type ArtifactUrls = {
   screenshot?: string;
-  video?: string;
   trace?: string;
 };
 
 type ArtifactMetadata = {
   screenshot?: { mimeType: string; size: number };
-  video?: { mimeType: string; size: number };
   trace?: { mimeType: string; size: number };
 };
 
@@ -109,9 +106,6 @@ function getInitialResult(testCase: TestCase): RunResult {
     artifacts: {
       screenshot: testCase.artifactMetadata?.screenshot
         ? `/api/test-cases/${testCase.id}/artifacts/screenshot`
-        : undefined,
-      video: testCase.artifactMetadata?.video
-        ? `/api/test-cases/${testCase.id}/artifacts/video`
         : undefined,
       trace: testCase.artifactMetadata?.trace
         ? `/api/test-cases/${testCase.id}/artifacts/trace`
@@ -595,12 +589,6 @@ function ArtifactLinks({
       label: "Screenshot",
       icon: ImageIcon,
       href: artifacts?.screenshot,
-    },
-    {
-      key: "video" as const,
-      label: "Video",
-      icon: Video,
-      href: artifacts?.video,
     },
     {
       key: "trace" as const,
