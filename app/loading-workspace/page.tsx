@@ -29,8 +29,17 @@ export default function LoadingWorkspacePage() {
       return;
     }
 
+    const workspaceParams = new URLSearchParams();
+    const currentParams = new URLSearchParams(window.location.search);
+    if (currentParams.get("github_connected") === "true") {
+      workspaceParams.set("github_connected", "true");
+    }
+    const workspaceUrl = workspaceParams.size
+      ? `/workspace?${workspaceParams.toString()}`
+      : "/workspace";
+
     const redirectTimer = window.setTimeout(() => {
-      router.replace("/workspace");
+      router.replace(workspaceUrl);
     }, 1600);
 
     return () => window.clearTimeout(redirectTimer);

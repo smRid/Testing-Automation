@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { createHmac, randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getAuthenticatedClerkUserId } from "@/lib/github-connection";
@@ -13,15 +13,22 @@ export async function GET(req: NextRequest) {
   }
 
   const clientId = process.env.GITHUB_CLIENT_ID?.trim();
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET?.trim();
   const redirectUri = process.env.GITHUB_REDIRECT_URI?.trim();
 
-  if (!clientId || !redirectUri) {
+  if (!clientId || !clientSecret || !redirectUri) {
     return NextResponse.redirect(
       new URL("/workspace?github_error=oauth_not_configured", req.url)
     );
   }
 
   const state = randomBytes(32).toString("hex");
+  const encodedClerkUserId = Buffer.from(clerkUserId, "utf8").toString(
+    "base64url"
+  );
+  const userSignature = createHmac("sha256", clientSecret)
+    .update(`${state}.${encodedClerkUserId}`)
+    .digest("base64url");
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -46,13 +53,17 @@ export async function GET(req: NextRequest) {
     path: "/",
     sameSite: "lax",
   });
-  response.cookies.set(OAUTH_USER_COOKIE, clerkUserId, {
+  response.cookies.set(
+    OAUTH_USER_COOKIE,
+    `${encodedClerkUserId}.${userSignature}`,
+    {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 10 * 60,
     path: "/",
     sameSite: "lax",
-  });
+    }
+  );
 
   return response;
 }

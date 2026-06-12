@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { db, githubConnections } from "@/db";
@@ -39,12 +40,37 @@ function getOAuthError(data: unknown) {
   }
 }
 
-export async function GET(req: NextRequest) {
-  const clerkUserId = await getAuthenticatedClerkUserId();
-  if (!clerkUserId) {
-    return NextResponse.redirect(new URL("/sign-in", req.url));
+function getOAuthClerkUserId(
+  value: string | undefined,
+  state: string,
+  clientSecret: string
+) {
+  if (!value) return null;
+
+  const [encodedClerkUserId, signature] = value.split(".");
+  if (!encodedClerkUserId || !signature) return null;
+
+  const expectedSignature = createHmac("sha256", clientSecret)
+    .update(`${state}.${encodedClerkUserId}`)
+    .digest("base64url");
+  const signatureBuffer = Buffer.from(signature);
+  const expectedSignatureBuffer = Buffer.from(expectedSignature);
+
+  if (
+    signatureBuffer.length !== expectedSignatureBuffer.length ||
+    !timingSafeEqual(signatureBuffer, expectedSignatureBuffer)
+  ) {
+    return null;
   }
 
+  try {
+    return Buffer.from(encodedClerkUserId, "base64url").toString("utf8");
+  } catch {
+    return null;
+  }
+}
+
+export async function GET(req: NextRequest) {
   const oauthError = req.nextUrl.searchParams.get("error");
   if (oauthError) {
     return redirectToWorkspace(req, oauthError);
@@ -53,7 +79,6 @@ export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
   const state = req.nextUrl.searchParams.get("state");
   const expectedState = req.cookies.get(OAUTH_STATE_COOKIE)?.value;
-  const expectedClerkUserId = req.cookies.get(OAUTH_USER_COOKIE)?.value;
 
   if (!code) {
     return redirectToWorkspace(req, "missing_code");
@@ -63,10 +88,6 @@ export async function GET(req: NextRequest) {
     return redirectToWorkspace(req, "invalid_state");
   }
 
-  if (!expectedClerkUserId || expectedClerkUserId !== clerkUserId) {
-    return redirectToWorkspace(req, "account_changed");
-  }
-
   const clientId = process.env.GITHUB_CLIENT_ID?.trim();
   const clientSecret = process.env.GITHUB_CLIENT_SECRET?.trim();
   const redirectUri = process.env.GITHUB_REDIRECT_URI?.trim();
@@ -74,6 +95,24 @@ export async function GET(req: NextRequest) {
   if (!clientId || !clientSecret || !redirectUri) {
     return redirectToWorkspace(req, "oauth_not_configured");
   }
+
+  const expectedClerkUserId = getOAuthClerkUserId(
+    req.cookies.get(OAUTH_USER_COOKIE)?.value,
+    state,
+    clientSecret
+  );
+  if (!expectedClerkUserId) {
+    return redirectToWorkspace(req, "invalid_user_session");
+  }
+
+  const authenticatedClerkUserId = await getAuthenticatedClerkUserId();
+  if (
+    authenticatedClerkUserId &&
+    authenticatedClerkUserId !== expectedClerkUserId
+  ) {
+    return redirectToWorkspace(req, "account_changed");
+  }
+  const clerkUserId = expectedClerkUserId;
 
   try {
     const res = await fetch("https://github.com/login/oauth/access_token", {
@@ -149,7 +188,7 @@ export async function GET(req: NextRequest) {
     const encryptedAccessToken = encryptGitHubToken(token);
 
     try {
-      await db
+      const [savedConnection] = await db
         .insert(githubConnections)
         .values({
           clerkUserId,
@@ -170,14 +209,19 @@ export async function GET(req: NextRequest) {
             scopes,
             updatedAt: new Date(),
           },
-        });
+        })
+        .returning({ id: githubConnections.id });
+
+      if (!savedConnection) {
+        throw new Error("GitHub connection upsert returned no row");
+      }
     } catch (error) {
       console.error("Failed to save GitHub connection", error);
       return redirectToWorkspace(req, "connection_save_failed");
     }
 
     const response = NextResponse.redirect(
-      new URL("/workspace?github_connected=true", req.url)
+      new URL("/loading-workspace?github_connected=true", req.url)
     );
     response.cookies.delete(OAUTH_STATE_COOKIE);
     response.cookies.delete(OAUTH_USER_COOKIE);

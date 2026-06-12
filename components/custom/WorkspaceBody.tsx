@@ -56,6 +56,7 @@ function WorkspaceBody({
         identity_verification_failed: 'GitHub connected, but the account identity could not be verified.',
         incorrect_client_credentials: 'The GitHub client ID and client secret do not belong to the same OAuth App.',
         invalid_state: 'The GitHub authorization session expired. Please try connecting again.',
+        invalid_user_session: 'Your GitHub connection session could not be verified. Please connect again.',
         missing_code: 'GitHub did not return an authorization code. Please try again.',
         oauth_not_configured: 'GitHub OAuth is not configured on this server.',
         redirect_uri_mismatch: 'The callback URL does not exactly match the URL configured in the GitHub OAuth App.',

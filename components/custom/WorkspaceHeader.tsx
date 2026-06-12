@@ -15,9 +15,13 @@ function WorkspaceHeader() {
         </ul>
 
         <div className='flex justify-end'>
-          <div className='rounded-full border border-slate-200 bg-white p-1 shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-md'>
-            <UserButton />
-          </div>
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: 'h-9 w-9',
+              },
+            }}
+          />
         </div>
       </div>
     </header>
