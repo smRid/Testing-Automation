@@ -278,15 +278,7 @@ function ProductPreview() {
   );
 }
 
-function PreviewStat({
-  value,
-  label,
-  color,
-}: {
-  value: string;
-  label: string;
-  color: string;
-}) {
+function PreviewStat({ value, label, color }) {
   return (
     <div className="rounded-xl border border-[#e2e6ee] bg-[#fafbfe] p-3">
       <p className="text-xl font-bold text-[#171b24] sm:text-2xl">{value}</p>

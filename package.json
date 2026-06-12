@@ -1,12 +1,13 @@
 {
-  "name": "client",
-  "version": "0.1.0",
+  "name": "testflow",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate:browserless": "node --env-file=.env scripts/migrate-browserless.mjs",
