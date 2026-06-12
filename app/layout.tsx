@@ -6,6 +6,11 @@ import Provider from './provider';
 export const metadata: Metadata = {
   title: "TestFlow - AI Test Automation",
   description: "Generate, run, and review automated tests from one workspace.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
