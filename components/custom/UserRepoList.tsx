@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion"
 import Image from 'next/image'
 import { Button } from '../ui/button'
-import { CheckCircle2, Link2Icon, ListChecks, Loader2, Loader2Icon, Sparkles, TrendingUp, XCircle } from 'lucide-react'
+import { CheckCircle2, Link2Icon, ListChecks, Loader2Icon, Sparkles, TrendingUp, XCircle } from 'lucide-react'
 import { UserDetailContext } from '@/context/UserDetailContext'
 import axios from 'axios'
 import TestCaseList from './TestCaseList'
@@ -63,42 +63,80 @@ function UserRepoList({repoList,isLoading,setReload}:props) {
 });
 
 const { userDetail } = useContext(UserDetailContext);
-const [loading, setLoading] = useState(false);
+const [generatingRepoId, setGeneratingRepoId] = useState<number | null>(null);
+const [generationError, setGenerationError] = useState('');
 const [testCaseLoading, setTestCaseLoading] = useState(false);
 const [testCases, setTestCases] = useState<TestCase[]>([]);
+
+const updateTestCaseState = (nextTestCases: TestCase[]) => {
+    const passedTests = nextTestCases.filter((testCase) => testCase.status === 'passed').length;
+    const failedTests = nextTestCases.filter((testCase) => testCase.status === 'failed').length;
+    const passRate = nextTestCases.length
+        ? Math.round((passedTests / nextTestCases.length) * 100)
+        : 0;
+
+    setStatusData({
+        totalTests: nextTestCases.length,
+        passedTests,
+        failedTests,
+        passRate,
+    });
+    setTestCases(nextTestCases);
+};
+
 const handleGenerateTestCases = async (repo: UserRepo) => {
-    // Implement the logic to call the API route to generate test cases 
-    setLoading(true) 
-    const result = await axios.post('/api/generate-test-cases', {
-        userId: userDetail?.id,
-        repoId: repo?.repoId,
-        owner: repo.owner,
-        repo: repo.name,
-        branch: repo.defaultBranch,
-    })
-        console.log(result.data)
-        setLoading(false) 
+    if (!userDetail?.id || generatingRepoId !== null) return;
+
+    setGeneratingRepoId(repo.repoId);
+    setGenerationError('');
+
+    try {
+        const result = await axios.post<{ testCases?: TestCase[] }>(
+            '/api/generate-test-cases',
+            {
+                userId: userDetail.id,
+                repoId: repo.repoId,
+                owner: repo.owner,
+                repo: repo.name,
+                branch: repo.defaultBranch,
+            }
+        );
+
+        if (Array.isArray(result.data.testCases)) {
+            updateTestCaseState(result.data.testCases);
+        }
+
+        await GetTestCases(repo.repoId, false);
+    } catch (error) {
+        if (axios.isAxiosError<{ error?: string }>(error)) {
+            setGenerationError(
+                error.response?.data?.error || 'Failed to generate test cases.'
+            );
+        } else {
+            setGenerationError('Failed to generate test cases.');
+        }
+    } finally {
+        setGeneratingRepoId(null);
+    }
 }
 
-const GetTestCases = async (repoId: number) => {
-    // Implement the logic to fetch test cases for the selected repository
-    setTestCaseLoading(true);
-    setTestCases([]);
-    const result = await axios.get(`/api/test-cases?repoId=${repoId}`);
-    console.log(result.data);
-    const userTestCases= result.data as TestCase[];
-    const passedTests=userTestCases?.filter(testCase=>testCase.status=='passed').length || 0;
-    const failedTests=userTestCases?.filter(testCase=>testCase.status=='failed').length || 0;
-    const passRate= userTestCases?.length ? Math.round((passedTests / userTestCases.length) * 100) : 0;
-    
-    setStatusData({
-    totalTests: result.data.length,
-    passedTests:passedTests,
-    failedTests:failedTests,
-    passRate:passRate
-})
-    setTestCases(result.data);
-    setTestCaseLoading(false);
+const GetTestCases = async (repoId: number, showLoader = true) => {
+    if (showLoader) {
+        setTestCaseLoading(true);
+        setTestCases([]);
+    }
+
+    try {
+        const result = await axios.get<TestCase[]>(
+            `/api/test-cases?repoId=${repoId}`,
+            { headers: { 'Cache-Control': 'no-cache' } }
+        );
+        updateTestCaseState(Array.isArray(result.data) ? result.data : []);
+    } finally {
+        if (showLoader) {
+            setTestCaseLoading(false);
+        }
+    }
 }
 
   return (
@@ -117,7 +155,14 @@ const GetTestCases = async (repoId: number) => {
         {isLoading ? (
             <RepositoryListSkeleton />
         ) : (
-            <Accordion type="single" collapsible defaultValue="item-1" onValueChange={(value)=> GetTestCases(Number(value))} className='space-y-3'>
+            <Accordion
+                type="single"
+                collapsible
+                onValueChange={(value) => {
+                    if (value) void GetTestCases(Number(value));
+                }}
+                className='space-y-3'
+            >
                 {repoList.map((repo, index) => (
                     <AccordionItem key={`${repo.repoId}-${index}`} value={(repo.repoId).toString()} className='overflow-hidden rounded-2xl border border-slate-200 bg-white px-4 shadow-[0_4px_14px_rgba(15,23,42,0.04)] transition-all duration-300 hover:border-blue-200 hover:shadow-[0_10px_24px_rgba(37,99,235,0.08)] sm:px-5 data-[state=open]:border-blue-200 data-[state=open]:shadow-[0_12px_28px_rgba(37,99,235,0.09)]'>
                         <AccordionTrigger className='gap-3 py-4 text-left hover:no-underline sm:py-5'>
@@ -187,25 +232,39 @@ const GetTestCases = async (repoId: number) => {
                                     />
                                 )}
 
-                                {testCaseLoading?
+                                {testCaseLoading || generatingRepoId === repo.repoId ?
                                     <div className='flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-blue-200 bg-blue-50/50 text-sm font-medium text-blue-700'>
                                         <Loader2Icon className='h-6 w-6 animate-spin'/>
-                                        Loading test cases...
+                                        <span>
+                                            {generatingRepoId === repo.repoId
+                                                ? 'Analyzing repository and generating test cases...'
+                                                : 'Loading test cases...'}
+                                        </span>
+                                        {generatingRepoId === repo.repoId && (
+                                            <span className='text-xs font-normal text-blue-600'>
+                                                This may take a minute. You can stay on this page.
+                                            </span>
+                                        )}
                                     </div>
                                     : testCases?.length==0 &&
                                     <div className='flex flex-col justify-between gap-5 rounded-xl border border-dashed border-blue-200 bg-gradient-to-br from-blue-50/80 to-indigo-50/70 p-5 sm:flex-row sm:items-center'>
                                     <div>
                                         <h3 className='font-semibold text-slate-900'>
-                                            {loading ? 'Generating Test Cases...' :
-                                                'Generate AI Test Cases'}</h3>
+                                            Generate AI Test Cases
+                                        </h3>
                                         <p className='mt-1 text-sm leading-6 text-slate-500'>
                                             Analyze this repository and generate automated test cases using AI.
                                         </p>
+                                        {generationError && (
+                                            <p role='alert' className='mt-2 text-sm font-medium text-red-600'>
+                                                {generationError}
+                                            </p>
+                                        )}
                                     </div>
 
-                                    <Button className='h-11 w-full gap-2 rounded-xl bg-blue-600 px-5 font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 sm:w-auto' onClick={()=> handleGenerateTestCases(repo)} disabled={loading}>
+                                    <Button className='h-11 w-full gap-2 rounded-xl bg-blue-600 px-5 font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 sm:w-auto' onClick={()=> void handleGenerateTestCases(repo)} disabled={generatingRepoId !== null}>
                                         <Sparkles className='h-4 w-4' />
-                                        {loading ? <Loader2 className='animate-spin' />: 'Generate Test Cases'}
+                                        Generate Test Cases
                                     </Button>
                                 </div>}
                             </div>

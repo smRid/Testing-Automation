@@ -41,6 +41,10 @@ export async function GET(req: NextRequest) {
       .from(TestCasesTable)
       .where(eq(TestCasesTable.repoId, repoId));
 
-    return NextResponse.json(result)
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    })
 
 }
