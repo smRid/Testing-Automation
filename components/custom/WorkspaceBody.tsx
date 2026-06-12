@@ -124,9 +124,9 @@ function WorkspaceBody({
             <div>
                 <p className='mb-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-600'>Automation hub</p>
                 <h2 className='text-3xl font-bold leading-none tracking-[-0.04em] text-slate-950 sm:text-4xl lg:text-[44px]'>Workspace</h2>
-                <p className='mt-3 max-w-xl text-sm leading-6 text-slate-500 sm:text-base'>Connect repositories, generate test cases, and review Browserless runs from one place.</p>
+                
             </div>
-            <h2 className='w-fit rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold leading-tight text-blue-800 shadow-sm sm:text-base'>Remaining Credits: <span className='text-blue-950'>{userDetail?.credits ?? '—'}</span></h2>
+            {/* <h2 className='w-fit rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold leading-tight text-blue-800 shadow-sm sm:text-base'>Remaining Credits: <span className='text-blue-950'>{userDetail?.credits ?? '—'}</span></h2> */}
         </div>
 
         <Card className={'group mt-7 flex min-h-[116px] flex-col items-stretch justify-between gap-5 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 px-5 py-5 text-slate-950 shadow-[0_12px_32px_rgba(15,23,42,0.07)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_18px_42px_rgba(37,99,235,0.10)] sm:flex-row sm:items-center sm:px-7'}>

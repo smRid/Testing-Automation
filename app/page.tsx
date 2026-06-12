@@ -13,6 +13,7 @@ import {
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Show,
   SignInButton,
@@ -144,9 +145,14 @@ export default function Home() {
 function Brand() {
   return (
     <div className="flex items-center gap-3">
-      <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-[#2f65e8] text-white shadow-sm">
-        <TestTube2 className="h-5 w-5" />
-      </span>
+      <Image
+        src="/logo.png"
+        alt="TestFlow"
+        width={519}
+        height={481}
+        priority
+        className="h-10 w-10 object-contain"
+      />
       <span className="text-lg font-bold tracking-[-0.03em] text-[#131722]">
         TestFlow
       </span>
