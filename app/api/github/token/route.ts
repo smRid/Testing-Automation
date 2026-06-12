@@ -12,18 +12,33 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const connection = await getGitHubConnectionForUser(clerkUserId);
+  try {
+    const connection = await getGitHubConnectionForUser(clerkUserId);
 
-  return NextResponse.json({
-    connected: Boolean(connection),
-    account: connection
-      ? {
-          id: connection.githubUserId,
-          login: connection.githubLogin,
-          avatarUrl: connection.githubAvatarUrl,
-        }
-      : null,
-  });
+    return NextResponse.json(
+      {
+        connected: Boolean(connection),
+        account: connection
+          ? {
+              id: connection.githubUserId,
+              login: connection.githubLogin,
+              avatarUrl: connection.githubAvatarUrl,
+            }
+          : null,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Failed to load GitHub connection", error);
+    return NextResponse.json(
+      { error: "Unable to load GitHub connection." },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE() {

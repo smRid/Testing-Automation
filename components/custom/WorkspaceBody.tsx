@@ -33,21 +33,34 @@ type GitHubAccount = {
     avatarUrl: string | null;
 }
 
-function WorkspaceBody({ githubError }: { githubError?: string }) {
+function WorkspaceBody({
+    githubConnected = false,
+    githubError,
+}: {
+    githubConnected?: boolean;
+    githubError?: string;
+}) {
 
     const { userDetail } = useContext(UserDetailContext);
     const [githubAccount, setGitHubAccount] = useState<GitHubAccount | null>(null);
+    const [isGitHubLoading, setIsGitHubLoading] = useState(true);
+    const [githubStatusError, setGitHubStatusError] = useState('');
     const [isDisconnecting, setIsDisconnecting] = useState(false);
     const [userRepoList,setUserRepoList] = useState<UserRepo[]>([]);
     const [isRepoListLoading, setIsRepoListLoading] = useState(true);
     const githubErrorMessage = githubError ? {
         access_denied: 'GitHub authorization was cancelled.',
         account_changed: 'Your signed-in account changed during GitHub authorization. Please try again.',
+        bad_verification_code: 'The GitHub authorization code expired or was already used. Please connect again.',
+        connection_save_failed: 'GitHub authorized successfully, but the connection could not be saved.',
         identity_verification_failed: 'GitHub connected, but the account identity could not be verified.',
+        incorrect_client_credentials: 'The GitHub client ID and client secret do not belong to the same OAuth App.',
         invalid_state: 'The GitHub authorization session expired. Please try connecting again.',
         missing_code: 'GitHub did not return an authorization code. Please try again.',
         oauth_not_configured: 'GitHub OAuth is not configured on this server.',
+        redirect_uri_mismatch: 'The callback URL does not exactly match the URL configured in the GitHub OAuth App.',
         token_exchange_failed: 'GitHub could not complete the connection. Check the OAuth app callback URL and credentials.',
+        unverified_user_email: 'Verify your primary email address on GitHub, then connect again.',
     }[githubError] || 'GitHub connection failed. Please try again.' : '';
 
     useEffect(() => {
@@ -60,11 +73,20 @@ function WorkspaceBody({ githubError }: { githubError?: string }) {
     },[userDetail])
 
     const GetGithubUserToken = async () => {
+        setIsGitHubLoading(true);
+        setGitHubStatusError('');
+
         try {
-            const result = await axios.get<{ connected: boolean; account: GitHubAccount | null }>('/api/github/token');
+            const result = await axios.get<{ connected: boolean; account: GitHubAccount | null }>(
+                '/api/github/token',
+                { headers: { 'Cache-Control': 'no-cache' } }
+            );
             setGitHubAccount(result.data.connected ? result.data.account : null);
         } catch {
             setGitHubAccount(null);
+            setGitHubStatusError('Unable to check your GitHub connection.');
+        } finally {
+            setIsGitHubLoading(false);
         }
     }
 
@@ -116,16 +138,42 @@ function WorkspaceBody({ githubError }: { githubError?: string }) {
                     <p className='mt-1.5 text-sm leading-5 text-slate-500'>Import a project to generate and run automated test cases.</p>
                 </div>
             </div>
-            <div className='shrink-0'>
-                {!githubAccount ? (
+            <div className='w-full shrink-0 sm:w-auto'>
+                {isGitHubLoading ? (
+                    <Button
+                        type='button'
+                        className='h-11 w-full rounded-xl bg-slate-200 px-6 font-semibold text-slate-600 shadow-none sm:w-auto'
+                        disabled
+                    >
+                        Checking GitHub...
+                    </Button>
+                ) : !githubAccount ? (
                     <Button className='h-11 w-full cursor-pointer rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_12px_24px_rgba(37,99,235,0.28)] sm:w-auto' onClick={OnAddRepo}>Connect GitHub</Button>
                 ) : (
-                    <div className='flex flex-col items-stretch gap-2 sm:items-end'>
-                        <span className='text-xs font-medium text-slate-500'>Connected as <strong className='text-slate-800'>@{githubAccount.login}</strong></span>
-                        <div className='flex flex-wrap gap-2'>
-                            <RepoDialog setRefreshPage={() =>GetUserAddedRepoList()} />
-                            <Button type='button' variant='outline' className='h-11 rounded-xl' onClick={OnAddRepo}>Switch account</Button>
-                            <Button type='button' variant='ghost' className='h-11 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700' onClick={DisconnectGitHub} disabled={isDisconnecting}>
+                    <div className='flex flex-col items-stretch gap-3 sm:items-end'>
+                        <span className='truncate text-xs font-medium text-slate-500'>
+                            Connected as <strong className='text-slate-900'>@{githubAccount.login}</strong>
+                        </span>
+                        <div className='grid grid-cols-1 gap-2 min-[480px]:grid-cols-3 sm:flex sm:flex-wrap sm:justify-end'>
+                            <RepoDialog
+                                openAfterConnect={githubConnected}
+                                setRefreshPage={() =>GetUserAddedRepoList()}
+                            />
+                            <Button
+                                type='button'
+                                variant='outline'
+                                className='h-11 rounded-xl border-slate-300 bg-white px-5 font-semibold text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:text-slate-950'
+                                onClick={OnAddRepo}
+                            >
+                                Switch account
+                            </Button>
+                            <Button
+                                type='button'
+                                variant='ghost'
+                                className='h-11 rounded-xl px-5 font-semibold text-red-600 hover:bg-red-50 hover:text-red-700'
+                                onClick={DisconnectGitHub}
+                                disabled={isDisconnecting}
+                            >
                                 {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
                             </Button>
                         </div>
@@ -138,6 +186,24 @@ function WorkspaceBody({ githubError }: { githubError?: string }) {
             <div role="alert" className="mt-4 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>{githubErrorMessage}</span>
+            </div>
+        )}
+
+        {githubStatusError && (
+            <div role="alert" className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <span className="flex items-start gap-3">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{githubStatusError}</span>
+                </span>
+                <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 border-amber-300 bg-white text-amber-900 hover:bg-amber-100"
+                    onClick={() => void GetGithubUserToken()}
+                >
+                    Retry
+                </Button>
             </div>
         )}
 

@@ -25,10 +25,15 @@ export async function GET(req: NextRequest) {
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
-    scope: "repo read:user",
     state,
     prompt: "select_account",
   });
+
+  // GitHub App user tokens use the app's fine-grained permissions, not OAuth
+  // scopes. Modern GitHub App client IDs use the "Iv" prefix.
+  if (!clientId.startsWith("Iv")) {
+    params.set("scope", "repo read:user");
+  }
 
   const response = NextResponse.redirect(
     `https://github.com/login/oauth/authorize?${params.toString()}`

@@ -29,14 +29,20 @@ export type Repo = {
   owner: string;
 }
 
-function RepoDialog({setRefreshPage}: {setRefreshPage:(refresh:boolean)=>void}) {
+function RepoDialog({
+    openAfterConnect = false,
+    setRefreshPage,
+}: {
+    openAfterConnect?: boolean;
+    setRefreshPage:(refresh:boolean)=>void;
+}) {
 
 
     const [repoList, setRepoList] = useState<Repo[]>([]);
     const [selectedRepo,setSelectedRepo] = useState<Repo | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const { userDetail } = useContext(UserDetailContext);
-    const [isOpen,setIsOpen] = useState(false);
+    const [isOpen,setIsOpen] = useState(openAfterConnect);
     const [isSaving, setIsSaving] = useState(false);
     const [saveError, setSaveError] = useState('');
     const [isLoadingRepos, setIsLoadingRepos] = useState(false);
@@ -49,6 +55,12 @@ function RepoDialog({setRefreshPage}: {setRefreshPage:(refresh:boolean)=>void}) 
             void GetRepoList();
         }
     }, [isOpen])
+
+    useEffect(() => {
+        if (openAfterConnect) {
+            setIsOpen(true);
+        }
+    }, [openAfterConnect])
 
     const GetRepoList = async () => {
         setIsLoadingRepos(true);

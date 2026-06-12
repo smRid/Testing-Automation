@@ -19,6 +19,26 @@ function redirectToWorkspace(req: NextRequest, error: string) {
   return response;
 }
 
+function getOAuthError(data: unknown) {
+  if (typeof data !== "object" || data === null) {
+    return "token_exchange_failed";
+  }
+
+  const error = "error" in data && typeof data.error === "string"
+    ? data.error
+    : null;
+
+  switch (error) {
+    case "incorrect_client_credentials":
+    case "redirect_uri_mismatch":
+    case "bad_verification_code":
+    case "unverified_user_email":
+      return error;
+    default:
+      return "token_exchange_failed";
+  }
+}
+
 export async function GET(req: NextRequest) {
   const clerkUserId = await getAuthenticatedClerkUserId();
   if (!clerkUserId) {
@@ -81,6 +101,7 @@ export async function GET(req: NextRequest) {
         : null;
 
     if (!res.ok || !token) {
+      const oauthError = getOAuthError(data);
       console.error("GitHub OAuth token exchange failed", {
         status: res.status,
         error:
@@ -88,7 +109,7 @@ export async function GET(req: NextRequest) {
             ? data.error
             : "unknown_error",
       });
-      return redirectToWorkspace(req, "token_exchange_failed");
+      return redirectToWorkspace(req, oauthError);
     }
 
     const profileResponse = await fetch("https://api.github.com/user", {
@@ -127,30 +148,37 @@ export async function GET(req: NextRequest) {
         : null;
     const encryptedAccessToken = encryptGitHubToken(token);
 
-    await db
-      .insert(githubConnections)
-      .values({
-        clerkUserId,
-        githubUserId: String(profile.id),
-        githubLogin: profile.login,
-        githubAvatarUrl: avatarUrl,
-        encryptedAccessToken,
-        scopes,
-        updatedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: githubConnections.clerkUserId,
-        set: {
+    try {
+      await db
+        .insert(githubConnections)
+        .values({
+          clerkUserId,
           githubUserId: String(profile.id),
           githubLogin: profile.login,
           githubAvatarUrl: avatarUrl,
           encryptedAccessToken,
           scopes,
           updatedAt: new Date(),
-        },
-      });
+        })
+        .onConflictDoUpdate({
+          target: githubConnections.clerkUserId,
+          set: {
+            githubUserId: String(profile.id),
+            githubLogin: profile.login,
+            githubAvatarUrl: avatarUrl,
+            encryptedAccessToken,
+            scopes,
+            updatedAt: new Date(),
+          },
+        });
+    } catch (error) {
+      console.error("Failed to save GitHub connection", error);
+      return redirectToWorkspace(req, "connection_save_failed");
+    }
 
-    const response = NextResponse.redirect(new URL("/workspace", req.url));
+    const response = NextResponse.redirect(
+      new URL("/workspace?github_connected=true", req.url)
+    );
     response.cookies.delete(OAUTH_STATE_COOKIE);
     response.cookies.delete(OAUTH_USER_COOKIE);
     response.cookies.delete("gh_token");
