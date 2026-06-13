@@ -24,6 +24,7 @@ import {
   SignInButton,
   SignUpButton,
 } from "@clerk/nextjs";
+import DemoVideoDialog from "@/components/custom/DemoVideoDialog";
 import { siteConfig } from "@/lib/site";
 
 const authRedirect = "/loading-workspace";
@@ -165,14 +166,7 @@ export default function Home() {
                 </Link>
               </Show>
 
-              <button
-                type="button"
-                aria-label="Watch demo"
-                className="flex h-[54px] cursor-default items-center gap-3 rounded-lg border border-[#dfe4ec] bg-white px-6 text-sm font-medium text-[#4b5563]"
-              >
-                <Play className="h-4 w-4" />
-                Watch demo
-              </button>
+              <DemoVideoDialog />
             </div>
           </div>
 
