@@ -140,7 +140,7 @@ export default function Home() {
       <FeatureStrip />
 
       <footer className="mx-auto flex max-w-[1240px] items-center justify-between border-t border-[#e5e9f2] px-5 py-8 text-xs text-[#8a93a5] sm:px-8 lg:px-10">
-        <p>© 2026 TestFlow. All rights reserved.</p>
+        <p>© 2026 Sarker Mohammad Riduan. All rights reserved.</p>
         <p>AI-powered test automation</p>
       </footer>
     </main>
