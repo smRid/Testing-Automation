@@ -1,15 +1,20 @@
 import {
   ArrowRight,
   CheckCircle2,
-  Clock3,
+  ChevronUp,
+  CircleDot,
+  Code2,
   FileArchive,
   FolderGit2,
-  LayoutGrid,
+  Github,
+  KeyRound,
+  LogOut,
   Play,
   PlayCircle,
-  Settings,
+  Plus,
+  RefreshCw,
+  SlidersHorizontal,
   Sparkles,
-  TestTube2,
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
@@ -161,131 +166,204 @@ function Brand() {
 }
 
 function ProductPreview() {
-  const menuItems = [
-    { label: "Dashboard", icon: LayoutGrid, active: true },
-    { label: "Repositories", icon: FolderGit2 },
-    { label: "Test cases", icon: TestTube2 },
-    { label: "Settings", icon: Settings },
-  ];
-
-  const testRuns = [
+  const testCases = [
     {
-      title: "Authentication flow",
-      subtitle: "Passed in 18.4s",
-      icon: CheckCircle2,
-      color: "text-emerald-600",
-      badge: "UI",
+      title: "Validate Image Extraction API",
+      subtitle: "Verify that image extraction returns successfully populated data.",
+      type: "API",
+      priority: "HIGH",
+      icon: Code2,
+      color: "text-blue-600",
     },
     {
-      title: "Repository settings",
-      subtitle: "Running in Browserless",
-      icon: Clock3,
-      color: "text-amber-500",
-      badge: "E2E",
-    },
-    {
-      title: "Checkout validation",
-      subtitle: "Failed assertion",
+      title: "Invalid Image Upload Validation",
+      subtitle: "Ensure the application rejects files that are too large or invalid.",
+      type: "VALIDATION",
+      priority: "HIGH",
       icon: XCircle,
-      color: "text-rose-500",
-      badge: "API",
+      color: "text-indigo-600",
+    },
+    {
+      title: "Add Manual Event to Tracker",
+      subtitle: "Confirm manually entered events appear in the tracker dashboard.",
+      type: "MANUAL",
+      priority: "MEDIUM",
+      icon: Plus,
+      color: "text-blue-600",
+    },
+    {
+      title: "Logout Functionality",
+      subtitle: "Ensure that the admin logout button ends the current session.",
+      type: "UI",
+      priority: "HIGH",
+      icon: LogOut,
+      color: "text-violet-600",
+    },
+    {
+      title: "Admin Authentication Flow",
+      subtitle: "Validate access with registered credentials and reject invalid users.",
+      type: "AUTH",
+      priority: "HIGH",
+      icon: KeyRound,
+      color: "text-purple-600",
     },
   ];
 
   return (
-    <div className="relative mx-auto w-full max-w-[620px]">
-      <div className="overflow-hidden rounded-[22px] border border-[#dfe4ed] bg-white shadow-[0_28px_65px_rgba(35,48,82,0.18)]">
-        <div className="flex h-14 items-center justify-between border-b border-[#e5e9f2] bg-[#fbfcfe] px-5">
-          <div className="flex gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#ff6259]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#ffc143]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#32c55a]" />
+    <div className="relative mx-auto w-full max-w-[650px]">
+      <div className="rounded-[18px] border border-[#dfe5ee] bg-[#f8fafc] p-3 shadow-[0_28px_65px_rgba(35,48,82,0.16)] sm:p-4">
+        <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-[#e1e6ee] bg-white px-3 py-2.5 shadow-[0_3px_10px_rgba(15,23,42,0.05)]">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-[#dfe4eb] bg-[#f8fafc]">
+              <Github className="h-4 w-4 text-[#111827]" />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-[10px] font-semibold text-[#182033] sm:text-[11px]">
+                Connect GitHub & Add Repository
+              </p>
+              <p className="mt-0.5 truncate text-[7px] text-[#8a94a7] sm:text-[8px]">
+                Import a project to generate and run automated test cases.
+              </p>
+            </div>
           </div>
-          <div className="h-7 w-[190px] rounded-md bg-[#e9ecf2]" />
-          <div className="h-7 w-16 rounded-md bg-[#2f65e8]" />
+          <div className="flex shrink-0 items-center gap-1.5">
+            <span className="hidden rounded-md bg-[#2563eb] px-3 py-1.5 text-[8px] font-semibold text-white sm:inline-flex">
+              + Add Repository
+            </span>
+            <span className="rounded-md border border-[#dfe4eb] bg-white px-2.5 py-1.5 text-[8px] font-medium text-[#475569]">
+              Switch account
+            </span>
+          </div>
         </div>
 
-        <div className="grid min-h-[340px] grid-cols-[150px_1fr] sm:grid-cols-[185px_1fr]">
-          <aside className="border-r border-[#e5e9f2] bg-[#fafbfe] p-4">
-            <div className="mb-5 grid h-9 w-9 place-items-center rounded-lg bg-[#2f65e8] text-white">
-              <TestTube2 className="h-4.5 w-4.5" />
+        <div className="rounded-xl border border-[#e1e6ee] bg-white p-3 shadow-[0_4px_16px_rgba(15,23,42,0.06)] sm:p-4">
+          <div className="mb-3 flex items-end justify-between">
+            <div>
+              <p className="text-[12px] font-bold tracking-[-0.02em] text-[#172033] sm:text-sm">
+                Repositories
+              </p>
+              <p className="mt-0.5 text-[7px] text-[#8a94a7] sm:text-[8px]">
+                Select a repository to view its test coverage and execution history.
+              </p>
             </div>
+            <span className="rounded-full bg-[#f1f5f9] px-2 py-1 text-[7px] font-semibold text-[#64748b]">
+              1 connected
+            </span>
+          </div>
 
-            <div className="space-y-2">
-              {menuItems.map(({ label, icon: Icon, active }) => (
-                <div
-                  key={label}
-                  className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] sm:text-xs ${
-                    active
-                      ? "bg-[#edf3ff] font-medium text-[#2f65e8]"
-                      : "text-[#7c8597]"
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span>{label}</span>
+          <div className="overflow-hidden rounded-xl border border-[#9fc3ff] bg-white shadow-[0_6px_18px_rgba(37,99,235,0.08)]">
+            <div className="flex items-center justify-between px-3 py-2.5">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-[#e0e5ec] bg-[#f8fafc]">
+                  <Github className="h-3.5 w-3.5 text-[#1f2937]" />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-[9px] font-semibold text-[#172033] sm:text-[10px]">
+                    ridu16/ridu1-action-tracker
+                  </p>
+                  <p className="mt-0.5 text-[7px] text-[#8290a5]">
+                    main <span className="mx-1 text-[#60a5fa]">•</span> TypeScript
+                  </p>
                 </div>
-              ))}
-            </div>
-          </aside>
-
-          <div className="p-5">
-            <div className="grid grid-cols-3 gap-3">
-              <PreviewStat value="24" label="Tests" color="bg-emerald-500" />
-              <PreviewStat value="18" label="Passed" color="bg-[#2f65e8]" />
-              <PreviewStat value="6" label="Failed" color="bg-rose-500" />
-            </div>
-
-            <div className="mt-7 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-[#202532]">
-                  Recent test runs
-                </p>
-                <p className="mt-1 text-[11px] text-[#8b94a6]">
-                  Browserless cloud execution
-                </p>
               </div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#edf3ff] px-2.5 py-1 text-[10px] font-medium text-[#2f65e8]">
-                <Sparkles className="h-3 w-3" />
-                AI generated
-              </span>
+              <ChevronUp className="h-3.5 w-3.5 text-[#718096]" />
             </div>
 
-            <div className="mt-3 divide-y divide-[#e8ebf1]">
-              {testRuns.map(({ title, subtitle, icon: Icon, color, badge }) => (
-                <div
-                  key={title}
-                  className="flex items-center gap-3 py-3.5"
-                >
-                  <Icon className={`h-5 w-5 shrink-0 ${color}`} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-[#282e3a]">
-                      {title}
+            <div className="border-t border-[#edf0f5] px-3 pb-3 pt-2.5">
+              <div className="flex items-center justify-between gap-3 rounded-lg border border-[#e3e8ef] bg-[#f8fafc] px-2.5 py-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-[#dcfce7]">
+                    <CircleDot className="h-3 w-3 text-[#16a34a]" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[6px] font-bold uppercase tracking-wider text-[#94a3b8]">
+                      Target domain
                     </p>
-                    <p className="mt-1 truncate text-[10px] text-[#8b94a6]">
-                      {subtitle}
+                    <p className="truncate text-[8px] font-semibold text-[#16a34a] sm:text-[9px]">
+                      https://ridu-actiontracker.vercel.app/
                     </p>
                   </div>
-                  <span className="rounded-full bg-[#f1f4f8] px-2 py-1 text-[9px] font-semibold text-[#687286]">
-                    {badge}
+                </div>
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-md border border-[#d9e0e9] bg-white px-2 py-1 text-[7px] font-medium text-[#475569]">
+                  <SlidersHorizontal className="h-2.5 w-2.5" />
+                  Project Config
+                </span>
+              </div>
+
+              <div className="mt-2.5 grid grid-cols-4 gap-1.5">
+                <PreviewStat value="6" label="Total Tests" icon={Code2} color="text-blue-600 bg-blue-50" />
+                <PreviewStat value="0" label="Passed" icon={CheckCircle2} color="text-emerald-600 bg-emerald-50" />
+                <PreviewStat value="6" label="Failed" icon={XCircle} color="text-rose-500 bg-rose-50" />
+                <PreviewStat value="0%" label="Pass Rate" icon={Sparkles} color="text-purple-600 bg-purple-50" />
+              </div>
+
+              <div className="mt-2.5 overflow-hidden rounded-lg border border-[#dce3ed]">
+                <div className="flex items-center justify-between border-b border-[#e7ebf1] bg-[#fbfcfe] px-2.5 py-2">
+                  <div>
+                    <p className="text-[8px] font-semibold text-[#172033] sm:text-[9px]">
+                      Generated Test Cases
+                    </p>
+                    <p className="mt-0.5 text-[6px] text-[#94a3b8]">6 test cases available</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 rounded border border-[#dce3ed] bg-white px-2 py-1 text-[6px] font-medium text-[#64748b]">
+                    <RefreshCw className="h-2 w-2" /> Refresh
                   </span>
                 </div>
-              ))}
+
+                <div className="divide-y divide-[#edf0f4]">
+                  {testCases.map(({ title, subtitle, type, priority, icon: Icon, color }) => (
+                    <div key={title} className="flex items-center gap-2 px-2.5 py-1.5">
+                      <Icon className={`h-3 w-3 shrink-0 ${color}`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[7px] font-semibold text-[#273248] sm:text-[8px]">
+                          {title}
+                        </p>
+                        <p className="mt-0.5 hidden truncate text-[6px] text-[#98a2b3] sm:block">
+                          {subtitle}
+                        </p>
+                      </div>
+                      <span className="rounded-full border border-[#bfdbfe] bg-[#eff6ff] px-1.5 py-0.5 text-[5px] font-bold text-[#2563eb]">
+                        {type}
+                      </span>
+                      <span className={`rounded-full px-1.5 py-0.5 text-[5px] font-bold ${
+                        priority === "HIGH"
+                          ? "border border-[#fecaca] bg-[#fff1f2] text-[#ef4444]"
+                          : "border border-[#fde68a] bg-[#fffbeb] text-[#d97706]"
+                      }`}>
+                        {priority}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-end border-t border-[#e7ebf1] bg-[#fbfcfe] px-2.5 py-2">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[#2563eb] px-2.5 py-1.5 text-[6px] font-semibold text-white">
+                    <Play className="h-2.5 w-2.5 fill-current" />
+                    Run Selected
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <div className="pointer-events-none absolute -bottom-5 -left-5 -z-10 h-24 w-24 rounded-full bg-[#dce8ff] blur-2xl" />
+      <div className="pointer-events-none absolute -right-4 -top-6 -z-10 h-28 w-28 rounded-full bg-[#e7edff] blur-2xl" />
     </div>
   );
 }
 
-function PreviewStat({ value, label, color }) {
+function PreviewStat({ value, label, icon: Icon, color }) {
   return (
-    <div className="rounded-xl border border-[#e2e6ee] bg-[#fafbfe] p-3">
-      <p className="text-xl font-bold text-[#171b24] sm:text-2xl">{value}</p>
-      <p className="mt-1 text-[10px] text-[#8b94a6]">{label}</p>
-      <div className="mt-3 h-0.5 rounded-full bg-[#e7eaf0]">
-        <div className={`h-0.5 w-3/4 rounded-full ${color}`} />
+    <div className="flex min-w-0 items-center justify-between gap-1 rounded-lg border border-[#e1e6ee] bg-white p-2">
+      <div className="min-w-0">
+        <p className="truncate text-[6px] font-medium text-[#7d8899] sm:text-[7px]">{label}</p>
+        <p className="mt-0.5 text-[11px] font-bold text-[#172033] sm:text-xs">{value}</p>
       </div>
+      <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-md ${color}`}>
+        <Icon className="h-3 w-3" />
+      </span>
     </div>
   );
 }
