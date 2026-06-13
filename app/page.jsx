@@ -24,12 +24,55 @@ import {
   SignInButton,
   SignUpButton,
 } from "@clerk/nextjs";
+import { siteConfig } from "@/lib/site";
 
 const authRedirect = "/loading-workspace";
+
+export const metadata = {
+  title: "AI-Powered Test Automation for GitHub Projects",
+  description: siteConfig.description,
+  alternates: {
+    canonical: "/",
+  },
+};
+
+const softwareApplicationSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: siteConfig.name,
+  alternateName: siteConfig.shortName,
+  url: siteConfig.url,
+  description: siteConfig.description,
+  applicationCategory: "DeveloperApplication",
+  applicationSubCategory: "Software Testing Tool",
+  operatingSystem: "Web",
+  image: `${siteConfig.url}/preview2.png`,
+  screenshot: [
+    `${siteConfig.url}/preview1.png`,
+    `${siteConfig.url}/preview2.png`,
+  ],
+  featureList: [
+    "AI-generated test cases from GitHub repositories",
+    "Playwright script generation",
+    "Cloud browser test execution",
+    "Screenshots, traces, logs, and execution history",
+    "Repository-aware test planning",
+  ],
+  author: {
+    "@type": "Person",
+    name: "Sarker Mohammad Riduan",
+  },
+};
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#f8faff] text-[#111827]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(softwareApplicationSchema).replace(/</g, "\\u003c"),
+        }}
+      />
       <header className="border-b border-[#e5e9f2] bg-[#f8faff]/95">
         <div className="mx-auto flex h-[68px] max-w-[1480px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <Brand />
