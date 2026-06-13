@@ -286,22 +286,22 @@ export default function TestExecutionModal({
         }
       }}
     >
-      <DialogContent className="flex h-[96dvh] w-[calc(100vw-0.75rem)] max-w-6xl flex-col gap-3 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-2xl [&>button]:text-slate-500 [&>button:hover]:bg-slate-100 [&>button]:data-[state=open]:bg-slate-100 [&>button]:data-[state=open]:text-slate-500 sm:h-[94dvh] sm:w-[calc(100vw-2rem)] sm:gap-4 sm:p-5 lg:h-[90vh] lg:overflow-hidden lg:p-6">
-        <DialogHeader className="shrink-0 border-b border-slate-200 pb-3 sm:pb-4">
-          <DialogTitle className="flex items-center gap-2 pr-7 text-lg font-bold text-slate-900 sm:text-2xl">
+      <DialogContent className="flex h-[calc(100dvh-0.5rem)] w-[calc(100vw-0.5rem)] max-w-7xl flex-col gap-2.5 overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 text-slate-900 shadow-2xl [&>button]:text-slate-500 [&>button:hover]:bg-slate-100 [&>button]:data-[state=open]:bg-slate-100 [&>button]:data-[state=open]:text-slate-500 sm:h-[calc(100dvh-1.25rem)] sm:w-[calc(100vw-1.25rem)] sm:gap-3 sm:p-4 lg:overflow-hidden [@media(max-height:700px)]:gap-2 [@media(max-height:700px)]:p-3">
+        <DialogHeader className="shrink-0 border-b border-slate-200 pb-2 [@media(max-height:700px)]:space-y-0.5">
+          <DialogTitle className="flex items-center gap-2 pr-7 text-lg font-bold text-slate-900 sm:text-xl">
             <PlayCircle className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
             Browserless Cloud Test Runner
           </DialogTitle>
-          <DialogDescription className="text-xs leading-5 text-slate-500 sm:text-sm">
+          <DialogDescription className="text-xs leading-5 text-slate-500 sm:text-sm [@media(max-height:620px)]:hidden">
             Generate or reuse Playwright scripts, run them in Browserless, and retain
             execution artifacts.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex shrink-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
-          <div className="flex flex-col items-end gap-4 sm:flex-row">
+        <div className="flex shrink-0 flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3 [@media(max-height:700px)]:gap-2 [@media(max-height:700px)]:py-2">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-1.5">
-              <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 [@media(max-height:620px)]:sr-only">
                 <Globe className="h-3.5 w-3.5 text-blue-600" />
                 Target Website URL
               </label>
@@ -314,7 +314,7 @@ export default function TestExecutionModal({
               />
             </div>
 
-            <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:gap-2.5">
+            <div className="grid w-full grid-cols-1 gap-2 min-[480px]:grid-cols-2 sm:flex sm:w-auto sm:gap-2.5">
               <Button
                 type="button"
                 variant="outline"
@@ -407,8 +407,8 @@ export default function TestExecutionModal({
           )}
         </div>
 
-        <div className="grid flex-none grid-cols-1 gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-3 lg:gap-5">
-          <div className="flex max-h-64 flex-col gap-2 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/60 p-3 shadow-sm lg:max-h-none">
+        <div className="grid flex-none grid-cols-1 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-[clamp(220px,25vw,330px)_minmax(0,1fr)]">
+          <div className="flex max-h-56 min-h-0 flex-col gap-2 overflow-y-auto overscroll-contain rounded-xl border border-slate-200 bg-slate-50/60 p-3 shadow-sm sm:max-h-64 lg:max-h-none">
             <h3 className="mb-1 px-2 text-xs font-bold uppercase tracking-wider text-slate-500">
               Execution Queue
             </h3>
@@ -456,13 +456,13 @@ export default function TestExecutionModal({
             })}
           </div>
 
-          <div className="flex min-h-[420px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm lg:col-span-2 lg:min-h-0">
+          <div className="flex min-h-[360px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:min-h-[400px] lg:min-h-0">
             {selectedTestCase ? (
               <>
-                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 bg-slate-50/70 p-4">
-                  <div>
+                <div className="flex shrink-0 flex-col items-start justify-between gap-2 border-b border-slate-200 bg-slate-50/70 p-3 min-[560px]:flex-row">
+                  <div className="min-w-0">
                     <h3 className="font-bold text-slate-800">{selectedTestCase.title}</h3>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 line-clamp-2 text-xs text-slate-500 [@media(max-height:650px)]:line-clamp-1">
                       Expected: {selectedTestCase.expectedResult || "No expected result supplied"}
                     </p>
                     {selectedResult?.durationMs !== undefined && (
@@ -490,28 +490,32 @@ export default function TestExecutionModal({
                   )}
                 </div>
 
-                <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
-                  <ArtifactLinks
-                    artifacts={selectedResult?.artifacts}
-                    metadata={selectedResult?.artifactMetadata}
-                  />
+                <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain p-3 lg:grid lg:grid-rows-[auto_minmax(90px,0.8fr)_minmax(120px,1.2fr)] lg:overflow-hidden [@media(max-height:700px)]:gap-2 [@media(max-height:700px)]:p-2">
+                  <div>
+                    <ArtifactLinks
+                      artifacts={selectedResult?.artifacts}
+                      metadata={selectedResult?.artifactMetadata}
+                    />
+                  </div>
 
                   {selectedResult?.browserlessScript && (
-                    <div className="overflow-hidden rounded-lg border">
-                      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100 px-3.5 py-2">
+                    <div className="flex min-h-[130px] flex-col overflow-hidden rounded-lg border lg:min-h-0">
+                      <div className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-slate-100 px-3.5 py-2 [@media(max-height:700px)]:py-1.5">
                         <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
                           <Code className="h-3.5 w-3.5 text-blue-600" />
                           Browserless Playwright Script
                         </span>
                       </div>
-                      <pre className="max-h-40 overflow-x-auto bg-gray-950 p-3 font-mono text-[11px] leading-relaxed text-emerald-400">
+                      <pre className="min-h-0 flex-1 overflow-auto overscroll-contain whitespace-pre bg-gray-950 p-3 font-mono text-[11px] leading-relaxed text-emerald-400">
                         {selectedResult.browserlessScript}
                       </pre>
                     </div>
                   )}
 
-                  <div className="flex min-h-48 flex-1 flex-col overflow-hidden rounded-lg border">
-                    <div className="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-950 px-3.5 py-2.5 font-mono text-gray-200">
+                  <div className={`flex min-h-48 flex-1 flex-col overflow-hidden rounded-lg border lg:min-h-0 ${
+                    selectedResult?.browserlessScript ? "" : "lg:row-span-2"
+                  }`}>
+                    <div className="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-950 px-3.5 py-2.5 font-mono text-gray-200 [@media(max-height:700px)]:py-1.5">
                       <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
                         <Terminal className="h-3.5 w-3.5" />
                         Console Terminal Output
@@ -524,7 +528,7 @@ export default function TestExecutionModal({
                         {selectedResult?.status || "idle"}
                       </Badge>
                     </div>
-                    <div className="flex flex-1 select-text flex-col gap-1.5 overflow-y-auto bg-gray-950 p-3 font-mono text-[11px] text-gray-300">
+                    <div className="flex min-h-0 flex-1 select-text flex-col gap-1.5 overflow-auto overscroll-contain bg-gray-950 p-3 font-mono text-[11px] text-gray-300">
                       {(selectedResult?.logs || ["Waiting to run..."]).map((log, index) => (
                         <div
                           key={`${index}-${log}`}
@@ -561,12 +565,12 @@ export default function TestExecutionModal({
           </div>
         </div>
 
-        <div className="flex shrink-0 justify-end border-t border-slate-200 pt-3 sm:pt-4">
+        <div className="flex shrink-0 justify-end border-t border-slate-200 pt-2.5 [@media(max-height:700px)]:pt-2">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isExecuting}
-            className="h-10 w-full rounded-xl border-slate-300 bg-white px-5 font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 sm:w-auto"
+            className="h-10 w-full rounded-xl border-slate-300 bg-white px-5 font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 sm:w-auto [@media(max-height:620px)]:h-9"
           >
             Close & Refresh Status
           </Button>
