@@ -168,40 +168,40 @@ function Brand() {
 function ProductPreview() {
   const testCases = [
     {
-      title: "Validate Image Extraction API",
-      subtitle: "Verify that image extraction returns successfully populated data.",
+      title: "Customer login flow",
+      subtitle: "Confirms valid users can securely access their account.",
       type: "API",
       priority: "HIGH",
       icon: Code2,
       color: "text-blue-600",
     },
     {
-      title: "Invalid Image Upload Validation",
-      subtitle: "Ensure the application rejects files that are too large or invalid.",
-      type: "VALIDATION",
+      title: "Invalid form validation",
+      subtitle: "Checks required fields and invalid input messages.",
+      type: "E2E",
       priority: "HIGH",
       icon: XCircle,
       color: "text-indigo-600",
     },
     {
-      title: "Add Manual Event to Tracker",
-      subtitle: "Confirm manually entered events appear in the tracker dashboard.",
-      type: "MANUAL",
+      title: "Create a new project",
+      subtitle: "Verifies that a project is created with the selected settings.",
+      type: "UI",
       priority: "MEDIUM",
       icon: Plus,
       color: "text-blue-600",
     },
     {
-      title: "Logout Functionality",
-      subtitle: "Ensure that the admin logout button ends the current session.",
+      title: "Account sign out",
+      subtitle: "Ends the active session and returns to the sign-in page.",
       type: "UI",
       priority: "HIGH",
       icon: LogOut,
       color: "text-violet-600",
     },
     {
-      title: "Admin Authentication Flow",
-      subtitle: "Validate access with registered credentials and reject invalid users.",
+      title: "Role-based access",
+      subtitle: "Restricts protected pages based on the user role.",
       type: "AUTH",
       priority: "HIGH",
       icon: KeyRound,
@@ -210,40 +210,35 @@ function ProductPreview() {
   ];
 
   return (
-    <div className="relative mx-auto w-full max-w-[650px]">
-      <div className="rounded-[18px] border border-[#dfe5ee] bg-[#f8fafc] p-3 shadow-[0_28px_65px_rgba(35,48,82,0.16)] sm:p-4">
-        <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-[#e1e6ee] bg-white px-3 py-2.5 shadow-[0_3px_10px_rgba(15,23,42,0.05)]">
+    <div className="relative mx-auto w-full max-w-[550px]">
+      <div className="rounded-2xl border border-[#dfe5ee] bg-[#f7f9fc] p-2.5 shadow-[0_22px_50px_rgba(35,48,82,0.13)] sm:p-3">
+        <div className="mb-2.5 flex items-center justify-between gap-3 rounded-lg border border-[#e3e7ee] bg-white px-3 py-2 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
           <div className="flex min-w-0 items-center gap-2.5">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-[#dfe4eb] bg-[#f8fafc]">
-              <Github className="h-4 w-4 text-[#111827]" />
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-[#f1f5f9]">
+              <Github className="h-3.5 w-3.5 text-[#334155]" />
             </span>
             <div className="min-w-0">
-              <p className="truncate text-[10px] font-semibold text-[#182033] sm:text-[11px]">
-                Connect GitHub & Add Repository
+              <p className="truncate text-[9px] font-semibold text-[#182033] sm:text-[10px]">
+                Connected repository
               </p>
               <p className="mt-0.5 truncate text-[7px] text-[#8a94a7] sm:text-[8px]">
-                Import a project to generate and run automated test cases.
+                Generate and run tests from your codebase.
               </p>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-1.5">
-            <span className="hidden rounded-md bg-[#2563eb] px-3 py-1.5 text-[8px] font-semibold text-white sm:inline-flex">
-              + Add Repository
-            </span>
-            <span className="rounded-md border border-[#dfe4eb] bg-white px-2.5 py-1.5 text-[8px] font-medium text-[#475569]">
-              Switch account
-            </span>
-          </div>
+          <span className="shrink-0 rounded-md bg-[#2563eb] px-2.5 py-1.5 text-[7px] font-semibold text-white sm:text-[8px]">
+            Add repository
+          </span>
         </div>
 
-        <div className="rounded-xl border border-[#e1e6ee] bg-white p-3 shadow-[0_4px_16px_rgba(15,23,42,0.06)] sm:p-4">
-          <div className="mb-3 flex items-end justify-between">
+        <div className="rounded-xl border border-[#e3e7ee] bg-white p-3">
+          <div className="mb-2.5 flex items-end justify-between">
             <div>
-              <p className="text-[12px] font-bold tracking-[-0.02em] text-[#172033] sm:text-sm">
+              <p className="text-[11px] font-bold tracking-[-0.02em] text-[#172033] sm:text-xs">
                 Repositories
               </p>
               <p className="mt-0.5 text-[7px] text-[#8a94a7] sm:text-[8px]">
-                Select a repository to view its test coverage and execution history.
+                Test coverage and recent execution results.
               </p>
             </div>
             <span className="rounded-full bg-[#f1f5f9] px-2 py-1 text-[7px] font-semibold text-[#64748b]">
@@ -251,28 +246,28 @@ function ProductPreview() {
             </span>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-[#9fc3ff] bg-white shadow-[0_6px_18px_rgba(37,99,235,0.08)]">
-            <div className="flex items-center justify-between px-3 py-2.5">
+          <div className="overflow-hidden rounded-lg border border-[#b8cefa] bg-white">
+            <div className="flex items-center justify-between px-3 py-2">
               <div className="flex min-w-0 items-center gap-2.5">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-[#e0e5ec] bg-[#f8fafc]">
-                  <Github className="h-3.5 w-3.5 text-[#1f2937]" />
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-[#f1f5f9]">
+                  <Github className="h-3 w-3 text-[#334155]" />
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-[9px] font-semibold text-[#172033] sm:text-[10px]">
-                    ridu16/ridu1-action-tracker
+                    acme/customer-portal
                   </p>
                   <p className="mt-0.5 text-[7px] text-[#8290a5]">
-                    main <span className="mx-1 text-[#60a5fa]">•</span> TypeScript
+                    main <span className="mx-1 text-[#60a5fa]">/</span> TypeScript
                   </p>
                 </div>
               </div>
               <ChevronUp className="h-3.5 w-3.5 text-[#718096]" />
             </div>
 
-            <div className="border-t border-[#edf0f5] px-3 pb-3 pt-2.5">
-              <div className="flex items-center justify-between gap-3 rounded-lg border border-[#e3e8ef] bg-[#f8fafc] px-2.5 py-2">
+            <div className="border-t border-[#edf0f5] px-3 pb-2.5 pt-2">
+              <div className="flex items-center justify-between gap-3 rounded-md bg-[#f8fafc] px-2.5 py-1.5">
                 <div className="flex min-w-0 items-center gap-2">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-[#dcfce7]">
+                  <span className="grid h-5 w-5 shrink-0 place-items-center rounded bg-[#dcfce7]">
                     <CircleDot className="h-3 w-3 text-[#16a34a]" />
                   </span>
                   <div className="min-w-0">
@@ -280,7 +275,7 @@ function ProductPreview() {
                       Target domain
                     </p>
                     <p className="truncate text-[8px] font-semibold text-[#16a34a] sm:text-[9px]">
-                      https://ridu-actiontracker.vercel.app/
+                      https://demo.testflow.app
                     </p>
                   </div>
                 </div>
@@ -290,20 +285,20 @@ function ProductPreview() {
                 </span>
               </div>
 
-              <div className="mt-2.5 grid grid-cols-4 gap-1.5">
-                <PreviewStat value="6" label="Total Tests" icon={Code2} color="text-blue-600 bg-blue-50" />
-                <PreviewStat value="0" label="Passed" icon={CheckCircle2} color="text-emerald-600 bg-emerald-50" />
-                <PreviewStat value="6" label="Failed" icon={XCircle} color="text-rose-500 bg-rose-50" />
-                <PreviewStat value="0%" label="Pass Rate" icon={Sparkles} color="text-purple-600 bg-purple-50" />
+              <div className="mt-2 grid grid-cols-4 gap-1.5">
+                <PreviewStat value="12" label="Total Tests" icon={Code2} color="text-blue-600 bg-blue-50" />
+                <PreviewStat value="10" label="Passed" icon={CheckCircle2} color="text-emerald-600 bg-emerald-50" />
+                <PreviewStat value="2" label="Failed" icon={XCircle} color="text-rose-500 bg-rose-50" />
+                <PreviewStat value="83%" label="Pass Rate" icon={Sparkles} color="text-purple-600 bg-purple-50" />
               </div>
 
-              <div className="mt-2.5 overflow-hidden rounded-lg border border-[#dce3ed]">
-                <div className="flex items-center justify-between border-b border-[#e7ebf1] bg-[#fbfcfe] px-2.5 py-2">
+              <div className="mt-2 overflow-hidden rounded-md border border-[#e1e6ed]">
+                <div className="flex items-center justify-between border-b border-[#e7ebf1] bg-[#fbfcfe] px-2.5 py-1.5">
                   <div>
                     <p className="text-[8px] font-semibold text-[#172033] sm:text-[9px]">
                       Generated Test Cases
                     </p>
-                    <p className="mt-0.5 text-[6px] text-[#94a3b8]">6 test cases available</p>
+                    <p className="mt-0.5 text-[6px] text-[#94a3b8]">12 test cases available</p>
                   </div>
                   <span className="inline-flex items-center gap-1 rounded border border-[#dce3ed] bg-white px-2 py-1 text-[6px] font-medium text-[#64748b]">
                     <RefreshCw className="h-2 w-2" /> Refresh
@@ -312,7 +307,7 @@ function ProductPreview() {
 
                 <div className="divide-y divide-[#edf0f4]">
                   {testCases.map(({ title, subtitle, type, priority, icon: Icon, color }) => (
-                    <div key={title} className="flex items-center gap-2 px-2.5 py-1.5">
+                    <div key={title} className="flex items-center gap-2 px-2.5 py-1">
                       <Icon className={`h-3 w-3 shrink-0 ${color}`} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[7px] font-semibold text-[#273248] sm:text-[8px]">
@@ -336,8 +331,8 @@ function ProductPreview() {
                   ))}
                 </div>
 
-                <div className="flex justify-end border-t border-[#e7ebf1] bg-[#fbfcfe] px-2.5 py-2">
-                  <span className="inline-flex items-center gap-1 rounded-md bg-[#2563eb] px-2.5 py-1.5 text-[6px] font-semibold text-white">
+                <div className="flex justify-end border-t border-[#e7ebf1] bg-[#fbfcfe] px-2.5 py-1.5">
+                  <span className="inline-flex items-center gap-1 rounded bg-[#2563eb] px-2.5 py-1 text-[6px] font-semibold text-white">
                     <Play className="h-2.5 w-2.5 fill-current" />
                     Run Selected
                   </span>
@@ -356,13 +351,13 @@ function ProductPreview() {
 
 function PreviewStat({ value, label, icon: Icon, color }) {
   return (
-    <div className="flex min-w-0 items-center justify-between gap-1 rounded-lg border border-[#e1e6ee] bg-white p-2">
+    <div className="flex min-w-0 items-center justify-between gap-1 rounded-md border border-[#e4e8ef] bg-white p-1.5">
       <div className="min-w-0">
         <p className="truncate text-[6px] font-medium text-[#7d8899] sm:text-[7px]">{label}</p>
         <p className="mt-0.5 text-[11px] font-bold text-[#172033] sm:text-xs">{value}</p>
       </div>
-      <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-md ${color}`}>
-        <Icon className="h-3 w-3" />
+      <span className={`grid h-5 w-5 shrink-0 place-items-center rounded ${color}`}>
+        <Icon className="h-2.5 w-2.5" />
       </span>
     </div>
   );
