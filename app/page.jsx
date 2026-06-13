@@ -30,7 +30,9 @@ import { siteConfig } from "@/lib/site";
 const authRedirect = "/loading-workspace";
 
 export const metadata = {
-  title: "AI-Powered Test Automation for GitHub Projects",
+  title: {
+    absolute: "Testflow - AI Testing Automation",
+  },
   description: siteConfig.description,
   alternates: {
     canonical: "/",
